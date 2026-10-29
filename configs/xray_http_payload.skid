@@ -1,0 +1,40 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v2.0
+# Preset: V2Ray/Xray + HTTP Proxy Payload Injector
+
+===========
+DNS Servers [tls://1dot1dot1dot1.cloudflare-dns.com, 1.1.1.1:53]
+VPN Servers [xray-ws.skidforge.example:8080]
+Addresses [10.213.99.2/24]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [80, 8080, 443, 2053]
+PROXY PORTS [10808, 10809, 8888]
+DNS PORTS [853, 53]
+Custom DNS Server []
+Custom VPN Server [xray-ws.skidforge.example:8080]
+Custom Proxy Server [127.0.0.1:10809]
+Firewall Rules [BLOCK_DOMAIN:ads.yahoo.com, BLOCK_PORT:25]
+Allowed DNS Records [Auto]
+On-Device Blocklists [oisd_small]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Xray-HTTP-Injector
+Proxy mode=HTTP
+DNS Mode=DNS-over-TLS
+Quad9=Off
+DNSCrypt=Adguard
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Cloudflare
+Tunnel=V2Ray/Xray
+Connect-from-mode=Http proxy
+===========
+Tunnel-Host=xray-ws.skidforge.example
+Tunnel-Port=8080
+V2Ray-Transport=ws
+SNI=speed.cloudflare.com
+Bug-Host=104.16.132.229
+HTTP-Payload=GET /ws HTTP/1.1[crlf]Host: [sni][crlf]Upgrade: websocket[crlf]Connection: Upgrade[crlf]User-Agent: SkidForge/2.0[crlf][crlf]
+DPI-Strategy=Always
+DPI-Technique=TCP
+TCP-MSS-Clamp=1340
+===========

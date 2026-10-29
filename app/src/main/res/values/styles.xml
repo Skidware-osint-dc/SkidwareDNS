@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="SkidTheme" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/skid_bg</item>
+        <item name="android:colorPrimary">@color/skid_surface</item>
+        <item name="android:colorPrimaryDark">@color/skid_bg</item>
+        <item name="android:colorAccent">@color/skid_cyan</item>
+        <item name="android:statusBarColor">@color/skid_bg</item>
+        <item name="android:navigationBarColor">@color/skid_surface</item>
+    </style>
+</resources>

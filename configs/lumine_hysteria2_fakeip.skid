@@ -1,0 +1,41 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v3.0
+# Preset: Lumine Fake-IP + Evozi Hysteria2 Salamander
+
+===========
+DNS Servers [tls://p2.freedns.controld.com, https://dns.quad9.net/dns-query]
+VPN Servers [hy2-brutal.skid.example:443]
+Addresses [10.213.88.2/24, fd00:534b:4944::88/64]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [443, 20000]
+PROXY PORTS [10808, 10809]
+DNS PORTS [853, 443]
+Custom DNS Server []
+Custom VPN Server [hy2-brutal.skid.example:443]
+Custom Proxy Server []
+Firewall Rules [BLOCK_DOMAIN:ads.tiktok.com, BLOCK_DOMAIN:app-measurement.com]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Lumine-Hysteria2-FakeIP
+Proxy mode=SOCKS5
+DNS Mode=Fake-IP
+Quad9=Security
+DNSCrypt=Adguard
+DNS-over-TLS=ControlD
+DNS-Proxy=Cloudflare
+Tunnel=Hysteria2
+Connect-from-mode=TLS/SSL (Obfs)
+===========
+Tunnel-Host=hy2-brutal.skid.example
+Tunnel-Port=443
+Hysteria-Obfs-Password=skid-salamander-v3
+Hysteria-Up-Mbps=80
+Hysteria-Down-Mbps=300
+Hysteria-Port-Hop-Range=20000-50000
+Fake-IP-Enabled=true
+Routing-Split-Preset=GFWList-Split
+TLS-Record-Fragment=true
+Mixed-Case-SNI=true
+===========

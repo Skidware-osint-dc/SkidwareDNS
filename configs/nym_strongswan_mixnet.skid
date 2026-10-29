@@ -1,0 +1,38 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v2.0
+# Preset: Nym Mixnet + strongSwan IKEv2 Hybrid
+
+===========
+DNS Servers [https://sky.rethinkdns.com/1:QAcCAIAcAhCkAg==, tls://dns.adguard-dns.com]
+VPN Servers [ch-mixnet-entry.nym.skid:1789, ch-ikev2.strongswan.skid:4500]
+Addresses [10.213.77.2/24, fd00:534b:4944::77/64]
+SOCKS5 [127.0.0.1:10808, 127.0.0.1:1080]
+VPN PORTS [500, 4500, 1789, 51820]
+PROXY PORTS [10808, 10809, 1080]
+DNS PORTS [443, 853, 53]
+Custom DNS Server [https://sky.rethinkdns.com/1:QAcCAIAcAhCkAg==]
+Custom VPN Server [ch-ikev2.strongswan.skid:4500]
+Custom Proxy Server []
+Firewall Rules [BLOCK_DOMAIN:app-measurement.com, BLOCK_DOMAIN:crashlytics.com, BLOCK_DOMAIN:branch.io]
+Allowed DNS Records [Auto]
+On-Device Blocklists [oisd_small, stevenblack_hosts, urlhaus_malware, hagezi_tif]
+===========
+Tor enabled=false
+Mode=Mixnet-5Hop
+Name=Nym-StrongSwan-Mixnet
+Proxy mode=SOCKS5
+DNS Mode=Rethink-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Adguard
+DNS-Proxy=Quad9 IPv6
+Tunnel=IKEv2/IPsec
+Connect-from-mode=TLS/SSL (stunnel)
+===========
+Rethink-DoH=https://sky.rethinkdns.com/1:QAcCAIAcAhCkAg==
+Mixnet-Mode=Anon-5Hop-Mixnet
+Kill-Switch=true
+Block-Screen-Locked=true
+Block-Bypassed-DNS=true
+Never-Proxy-DNS=true
+Do-Not-Route-Private-IPs=true
+===========

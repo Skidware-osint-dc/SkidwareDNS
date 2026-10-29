@@ -1,0 +1,42 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v5.1
+# Preset: Mullvad Tallinn Estonia ee-tll-wg-101 (xtom / 100 Gbps / Owned by Mullvad / DAITA)
+
+===========
+DNS Servers [https://dns.mullvad.net/dns-query, 100.64.0.1:53]
+VPN Servers [213.232.112.3:51820, ee-tll-wg-101.relays.mullvad.net:51820]
+Addresses [10.64.0.2/32, fc00:bbbb:bbbb:bb01::2/128]
+SOCKS5 [ee-tll-wg-socks5-101.relays.mullvad.net:1080, 127.0.0.1:10808]
+VPN PORTS [51820, 3503, 443]
+PROXY PORTS [1080, 10808, 10809]
+DNS PORTS [443, 53]
+Custom DNS Server []
+Custom VPN Server [213.232.112.3:51820]
+Custom Proxy Server [ee-tll-wg-socks5-101.relays.mullvad.net:1080]
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net, BLOCK_DOMAIN:ads.tiktok.com]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Mullvad-Tallinn-100G-DAITA
+Proxy mode=SOCKS5
+DNS Mode=Injector-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Quad9
+Tunnel=WireGuard
+Connect-from-mode=Direct
+===========
+WG-Profile-Name=mullvad-ee-tll-wg-101
+WG-Enabled=true
+WG-Endpoint=213.232.112.3:51820
+WG-Public-Key=Abxw9kZlH8Stt7mWJ2rKeCQjVVdJpLvV6czby23FzmA=
+Injector-DoH-Provider=Mullvad
+Mullvad-Enabled=true
+Mullvad-Multihop=false
+Mullvad-Exit-Relay=ee-tll-wg-101
+Mullvad-DAITA=true
+Mullvad-Use-Socks5=true
+Mullvad-Owned-Only=true
+===========

@@ -1,0 +1,43 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v5.1
+# Preset: Mullvad True WireGuard Multihop (Zurich Entry -> Tallinn 100G DAITA Exit :3514)
+
+===========
+DNS Servers [https://dns.mullvad.net/dns-query, 100.64.0.1:53]
+VPN Servers [193.32.127.71:3514, ee-tll-wg-102.relays.mullvad.net:51820]
+Addresses [10.64.0.2/32, fc00:bbbb:bbbb:bb01::2/128]
+SOCKS5 [ee-tll-wg-socks5-102.relays.mullvad.net:1080, 127.0.0.1:10808]
+VPN PORTS [3514, 51820]
+PROXY PORTS [1080, 10808, 10809]
+DNS PORTS [443, 53]
+Custom DNS Server []
+Custom VPN Server [193.32.127.71:3514]
+Custom Proxy Server [ee-tll-wg-socks5-102.relays.mullvad.net:1080]
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Mullvad-Multihop-ZRH-to-TLL
+Proxy mode=SOCKS5
+DNS Mode=Injector-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Quad9
+Tunnel=WireGuard
+Connect-from-mode=Direct
+===========
+WG-Profile-Name=mullvad-ch-zrh-wg-001-to-ee-tll-wg-102
+WG-Enabled=true
+WG-Endpoint=193.32.127.71:3514
+WG-Public-Key=TQi/1PpM98XRNEAYkyRR0lspDLg/SAarUkMclPDk52w=
+Injector-DoH-Provider=Mullvad
+Mullvad-Enabled=true
+Mullvad-Multihop=true
+Mullvad-Entry-Relay=ch-zrh-wg-001
+Mullvad-Exit-Relay=ee-tll-wg-102
+Mullvad-DAITA=true
+Mullvad-Use-Socks5=true
+Mullvad-Owned-Only=true
+===========

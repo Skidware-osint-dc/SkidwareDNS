@@ -1,0 +1,52 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v2.0
+# Preset: WireGuard skidwareproxy + Anti-Censorship DPI Desync + Bandwidth Booster
+
+===========
+DNS Servers [https://sky.rethinkdns.com/1:QAcCAIAcAhCkAg==, tls://1dot1dot1dot1.cloudflare-dns.com]
+VPN Servers [wg.skidwareproxy.example:51820]
+Addresses [10.213.37.2/24, fd00:534b:4944::2/64]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [51820, 443, 2408]
+PROXY PORTS [10808, 10809]
+DNS PORTS [443, 853, 53]
+Custom DNS Server []
+Custom VPN Server [wg.skidwareproxy.example:51820]
+Custom Proxy Server []
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net, BLOCK_DOMAIN:app-measurement.com, BLOCK_PORT:445]
+Allowed DNS Records [A, AAAA, CNAME, HTTPS, SVCB, TXT]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=skidwareproxy-DPI-Desync
+Proxy mode=SOCKS5
+DNS Mode=Rethink-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Cloudflare
+Tunnel=WireGuard
+Connect-from-mode=TLS/SSL (Obfs)
+===========
+WG-Enabled=true
+WG-Profile-Name=skidwareproxy
+WG-Endpoint=wg.skidwareproxy.example:51820
+Flood-WireGuard=true
+Smart-Persistent-Keepalive=true
+Proxy-Lockdown=true
+WireGuard-P2P=true
+Bandwidth-Booster=true
+Socket-Buffer-KB=2048
+Shorter-TCP-Keepalive=true
+TCP-NoDelay=true
+TCP-Fast-Open=true
+Endpoint-Independent-Mapping=true
+IP-Version=IPv4 + IPv6
+Perform-Protocol-Translations=true
+DPI-Strategy=Always
+DPI-Technique=Hybrid
+TLS-Record-Split-Bytes=3
+Global-DNS-Category=Smart DNS
+DNS-Booster=true
+Packet-Capture=Headers-Only
+===========

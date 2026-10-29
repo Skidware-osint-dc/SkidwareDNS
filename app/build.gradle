@@ -1,0 +1,31 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.skidwaredns.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.skidwaredns.app"
+        minSdk 24
+        targetSdk 34
+        versionCode 520
+        versionName "5.2.0-skid"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+}
+
+dependencies {
+    // Pure Android SDK VpnService + NIO/TLS/DNS stack — zero external bloat
+}

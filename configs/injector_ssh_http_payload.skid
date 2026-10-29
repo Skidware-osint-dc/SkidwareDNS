@@ -1,0 +1,48 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v4.0
+# Preset: HTTP Injector SSH + HTTP Proxy + Custom Payload + Header Replacer
+
+===========
+DNS Servers [https://cloudflare-dns.com/dns-query, 1.1.1.1:53]
+VPN Servers [ssh-edge.skidware.example:443]
+Addresses [10.213.22.2/24, fd00:534b:4944::22/64]
+SOCKS5 [127.0.0.1:1080]
+VPN PORTS [22, 443, 8080]
+PROXY PORTS [10808, 10809, 1080]
+DNS PORTS [443, 53]
+Custom DNS Server []
+Custom VPN Server [ssh-edge.skidware.example:443]
+Custom Proxy Server [127.0.0.1:10809]
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers]
+LBox Templates [cloudflare_dot]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Injector-HTTP-Proxy-SSH
+Proxy mode=HTTP
+DNS Mode=LBox-Template
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Cloudflare
+Tunnel=SSH
+Connect-from-mode=Http proxy
+===========
+Tunnel-Host=ssh-edge.skidware.example
+Tunnel-Port=443
+Tunnel-User=/root-skidware
+Custom-Payload-Enabled=true
+HTTP-Payload=CONNECT [host_port] HTTP/1.1[crlf]Host: [sni][crlf]X-Online-Host: [sni][crlf]Connection: Keep-Alive[crlf][crlf]
+SSH-Local-Port=1080
+SSH-UDPGW-Port=7300
+SSH-Send-Buffer-Bytes=16384
+SSH-Recv-Buffer-Bytes=32768
+SSH-Header-Replacer=true
+SSH-Route-Proxy=false
+Use-Default-Route=true
+Custom-Routes=0.0.0.0/0
+Excluded-Routes=10.0.0.0/8;172.16.0.0/12;192.168.0.0/16
+HTTP-Ping-Enabled=true
+HTTP-Ping-URL=clients3.google.com/generate_204
+===========

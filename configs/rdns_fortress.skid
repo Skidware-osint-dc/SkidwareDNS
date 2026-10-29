@@ -1,0 +1,48 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v2.0
+# Preset: RethinkDNS Security Fortress + DNS Booster + DPI Auto
+
+===========
+DNS Servers [https://sky.rethinkdns.com/sec, https://sky.rethinkdns.com/1:QAcCAIAcAhCkAg==]
+VPN Servers []
+Addresses [10.213.37.2/24, fd00:534b:4944::2/64]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [51820, 443]
+PROXY PORTS [10808, 10809]
+DNS PORTS [53, 853, 443]
+Custom DNS Server [https://sky.rethinkdns.com/sec]
+Custom VPN Server []
+Custom Proxy Server []
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net, BLOCK_DOMAIN:googleadservices.com, BLOCK_DOMAIN:graph.facebook.com, BLOCK_DOMAIN:app-measurement.com, BLOCK_DOMAIN:ads.tiktok.com, BLOCK_PORT:445, BLOCK_PORT:135]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing, OEM Telemetry]
+===========
+Tor enabled=false
+Mode=DNS+Firewall
+Name=RDNS-Security-Fortress
+Proxy mode=SOCKS5
+DNS Mode=Rethink-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Adguard
+DNS-Proxy=Quad9
+Tunnel=None
+Connect-from-mode=Direct
+===========
+Global-DNS-Category=Rethink DNS
+Rethink-DoH=https://sky.rethinkdns.com/sec
+DNS-Booster=true
+Prevent-DNS-Leaks=true
+Block-Unknown-DNS-Source=true
+On-Device-Blocklists-Enabled=true
+Shorter-TCP-Keepalive=true
+TCP-NoDelay=true
+Endpoint-Independent-Mapping=true
+Socket-Buffer-KB=512
+DPI-Strategy=Auto
+DPI-Technique=TCP/TLS
+TLS-Record-Split-Bytes=5
+Show-Provider-Info=true
+Firewall-Bubble=true
+Kill-Switch=true
+Block-Bypassed-DNS=true
+===========

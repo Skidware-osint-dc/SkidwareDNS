@@ -1,0 +1,43 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v4.1
+# Preset: HTTP Injector Shadowsocks-2022 BLAKE3 + TLS Obfs + Quad9 DoH
+
+===========
+DNS Servers [https://dns.quad9.net/dns-query]
+VPN Servers [ss2022-edge.skidware.example:8388]
+Addresses [10.213.99.2/24, fd00:534b:4944::99/64]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [8388, 443]
+PROXY PORTS [10808, 10809]
+DNS PORTS [443, 853]
+Custom DNS Server []
+Custom VPN Server [ss2022-edge.skidware.example:8388]
+Custom Proxy Server []
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net, BLOCK_DOMAIN:ads.tiktok.com]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Injector-SS2022-BLAKE3-Quad9
+Proxy mode=SOCKS5
+DNS Mode=Injector-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Quad9
+Tunnel=Shadowsocks
+Connect-from-mode=TLS/SSL (Obfs)
+===========
+Tunnel-Host=ss2022-edge.skidware.example
+Tunnel-Port=8388
+Tunnel-Auth=q8wL2m9xLpQ4wZn7cTyB1nF6hDsG3uAe5oVcXiYz08M=
+Tunnel-Cipher=2022-blake3-aes-256-gcm
+SS-Obfs-Server=obfs=tls;obfs-host=www.microsoft.com
+SNI=www.microsoft.com
+Injector-DoH-Provider=Quad9
+Use-Default-Route=true
+Custom-Routes=0.0.0.0/0
+Excluded-Routes=10.0.0.0/8;172.16.0.0/12;192.168.0.0/16
+HTTP-Ping-Enabled=true
+HTTP-Ping-URL=clients3.google.com/generate_204
+===========

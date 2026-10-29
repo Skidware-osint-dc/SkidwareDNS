@@ -1,0 +1,47 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v5.1
+# Preset: Mullvad Bridge ch-zrh-br-001 + WireGuard Exit ch-zrh-wg-003
+
+===========
+DNS Servers [https://dns.mullvad.net/dns-query, 100.64.0.1:53]
+VPN Servers [193.32.127.117:22, 193.32.127.72:3377]
+Addresses [10.64.0.2/32, fc00:bbbb:bbbb:bb01::2/128]
+SOCKS5 [ch-zrh-wg-socks5-003.relays.mullvad.net:1080, 127.0.0.1:10808]
+VPN PORTS [22, 443, 3377, 51820]
+PROXY PORTS [1080, 10808, 10809]
+DNS PORTS [443, 53]
+Custom DNS Server []
+Custom VPN Server [193.32.127.72:51820]
+Custom Proxy Server [193.32.127.117:22]
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Mullvad-Bridge-ZRH-BR001
+Proxy mode=SSH-Jump
+DNS Mode=Injector-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Quad9
+Tunnel=WireGuard
+Connect-from-mode=SSH Jump
+===========
+WG-Profile-Name=mullvad-ch-zrh-br-001-to-ch-zrh-wg-003
+WG-Enabled=true
+WG-Endpoint=193.32.127.72:51820
+WG-Public-Key=WHsy9kByfDzRtM1V/uDR2BFNUXqouU61vHdHnrgBMzI=
+Jump-Host-Enabled=true
+Jump-Protocol=SSH
+Jump-Host=193.32.127.117
+Jump-Port=22
+Injector-DoH-Provider=Mullvad
+Mullvad-Enabled=true
+Mullvad-Multihop=true
+Mullvad-Entry-Relay=ch-zrh-br-001
+Mullvad-Exit-Relay=ch-zrh-wg-003
+Mullvad-Bridge-Relay=ch-zrh-br-001
+Mullvad-SSH-SHA256=SHA256:IE/308Y8M8dOs+e2IP7sl1CtY6TSwt6uD5ygHTU/32w
+Mullvad-DAITA=false
+===========

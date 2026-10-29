@@ -1,0 +1,41 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v2.0
+# Preset: Hysteria + TLS/SSL Obfuscation
+
+===========
+DNS Servers [tls://p2.freedns.controld.com, https://sky.rethinkdns.com/1:QAcCAIAcAhCkAg==]
+VPN Servers [edge-hy2.skidnet.example:443]
+Addresses [10.213.88.2/24, fd00:534b:4944::88/64]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [443, 8443, 2083]
+PROXY PORTS [10808, 10809]
+DNS PORTS [853, 443, 53]
+Custom DNS Server [tls://p2.freedns.controld.com]
+Custom VPN Server [edge-hy2.skidnet.example:443]
+Custom Proxy Server [127.0.0.1:10808]
+Firewall Rules [BLOCK_DOMAIN:adservice.google.com, BLOCK_DOMAIN:scorecardresearch.com]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Hysteria-TLS-Obfs
+Proxy mode=SOCKS5
+DNS Mode=DNS-over-TLS
+Quad9=Off
+DNSCrypt=Adguard
+DNS-over-TLS=ControlD
+DNS-Proxy=Cloudflare
+Tunnel=Hysteria
+Connect-from-mode=TLS/SSL (Obfs)
+===========
+Global-DNS-Category=Other DNS
+Tunnel-Host=edge-hy2.skidnet.example
+Tunnel-Port=443
+SNI=cdn.cloudflare.com
+MTU=1380
+Socket-Buffer-KB=1024
+Endpoint-Independent-Mapping=true
+UDP-QUIC-Policy=Allow
+DPI-Strategy=Auto
+DPI-Technique=TCP/TLS
+===========

@@ -1,0 +1,42 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v3.0
+# Preset: AndroidMegaProxy Multi-Hop + MASQUE-H3 + UID Ownership
+
+===========
+DNS Servers [https://cloudflare-dns.com/dns-query, tls://dns.quad9.net]
+VPN Servers [exit-masque.megaproxy.example:443]
+Addresses [10.213.60.2/24, fd00:534b:4944::60/64]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [443, 8443]
+PROXY PORTS [10808, 10809]
+DNS PORTS [443, 853]
+Custom DNS Server []
+Custom VPN Server [exit-masque.megaproxy.example:443]
+Custom Proxy Server []
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers]
+LBox Templates [cloudflare_dot, quad9_doh]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=MegaProxy-MASQUE-Jump
+Proxy mode=HTTPS-Jump
+DNS Mode=LBox-Template
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Cloudflare
+Tunnel=MASQUE-H3
+Connect-from-mode=HTTPS Jump
+===========
+Tunnel-Host=exit-masque.megaproxy.example
+Tunnel-Port=443
+Jump-Host-Enabled=true
+Jump-Protocol=HTTPS
+Jump-Host=jump1-eu.megaproxy.example
+Jump-Port=443
+Proxy-Knock-Host=cp.cloudflare.com
+App-Ownership-Check=Standard
+JA3-Fingerprint=Chrome-128
+Strict-Route=true
+===========

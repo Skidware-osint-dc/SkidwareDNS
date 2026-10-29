@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer tactical shield -->
+    <path
+        android:fillColor="#112238"
+        android:strokeColor="#00F0FF"
+        android:strokeWidth="2.8"
+        android:pathData="M54,20 L80,31 L80,55 C80,72 68,84 54,90 C40,84 28,72 28,55 L28,31 Z" />
+    <!-- Inner emerald routing circuit -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#00FF9C"
+        android:strokeWidth="2.6"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M42,44 L54,37 L66,44 L66,53 L42,56 L42,65 L54,72 L66,65" />
+    <!-- Nodes -->
+    <path
+        android:fillColor="#00F0FF"
+        android:pathData="M54,34a3.2,3.2 0 1,0 0.01,0z" />
+    <path
+        android:fillColor="#00FF9C"
+        android:pathData="M54,75a3.2,3.2 0 1,0 0.01,0z" />
+</vector>

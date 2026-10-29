@@ -1,0 +1,41 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v3.0
+# Preset: LBox DNS Templates + TLS Fragmentation Core
+
+===========
+DNS Servers [https://dns.quad9.net/dns-query, tls://1dot1dot1dot1.cloudflare-dns.com]
+VPN Servers []
+Addresses [10.213.37.2/24, fd00:534b:4944::2/64]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [443, 8443]
+PROXY PORTS [10808, 10809]
+DNS PORTS [443, 853, 53]
+Custom DNS Server []
+Custom VPN Server []
+Custom Proxy Server []
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net, BLOCK_DOMAIN:ads.tiktok.com]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+LBox Templates [quad9_doh, cloudflare_dot, safe_dns_dot]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=LBox-TLS-Record-Frag
+Proxy mode=SOCKS5
+DNS Mode=LBox-Template
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Cloudflare
+Tunnel=None
+Connect-from-mode=Direct
+===========
+Strict-Route=true
+TUN-Stack=gvisor
+TLS-Fragment=true
+TLS-Record-Fragment=true
+TLS-Fallback-Delay-Ms=500
+Mixed-Case-SNI=true
+Spoof-SNI-Enabled=true
+Spoof-SNI-Host=play.googleapis.com
+DNS-Booster=true
+===========

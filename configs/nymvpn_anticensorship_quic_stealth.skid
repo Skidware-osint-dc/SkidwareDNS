@@ -1,0 +1,48 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v5.0
+# Preset: NymVPN Anti-Censorship QUIC + AmneziaWG + Stealth API Connect
+
+===========
+DNS Servers [https://dns.quad9.net/dns-query]
+VPN Servers [ca-vancouver-01.nym-gw.skid:443, ch-zurich-01.nym-gw.skid:51820]
+Addresses [10.213.56.2/24, fd00:534b:4944::56/64]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [443, 51820]
+PROXY PORTS [10808, 10809]
+DNS PORTS [443, 853]
+Custom DNS Server []
+Custom VPN Server [ca-vancouver-01.nym-gw.skid:443]
+Custom Proxy Server []
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=NymVPN-QUIC-AmneziaWG-Stealth
+Proxy mode=MASQUE-H3
+DNS Mode=Injector-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Quad9
+Tunnel=WireGuard
+Connect-from-mode=Direct
+===========
+WG-Enabled=true
+WG-Endpoint=ca-vancouver-01.nym-gw.skid:443
+Injector-DoH-Provider=Quad9
+Nym-Profile=Auto
+Nym-User-Country=US
+Mixnet-Continuous-Traffic=true
+Mixnet-Continuous-Rate=2 Mbps
+Mixnet-Cover-Traffic=true
+Mixnet-Cover-Rate=Balanced (5x)
+Mixnet-Packet-Mixing-Ms=15
+Nym-QUIC-Enhanced=true
+AmneziaWG-Minimal-Obfs=true
+AmneziaWG-Jc=6
+AmneziaWG-Jmin=50
+AmneziaWG-Jmax=90
+Nym-Stealth-API-Connect=true
+Nym-Stealth-Cover-Domains=cloudflare.com,cdn.jsdelivr.net,ajax.aspnetcdn.com
+===========

@@ -1,0 +1,53 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v3.0
+# Preset: InviZible Pro Complete Tri-Module Stack
+
+===========
+DNS Servers [sdns://AQMAAAAAAAAAETk0LjE0MC4xNC4xNDo1NDQzINErR_JS3PLCu_iZEIbq95zkSV2LFsigxDIuUso_OQhzIjIuZG5zY3J5cHQuZGVmYXVsdC5uczEuYWRndWFyZC5jb20]
+VPN Servers []
+Addresses [10.213.40.2/24, fd00:534b:4944::40/64]
+SOCKS5 [127.0.0.1:9050, 127.0.0.1:4447, 127.0.0.1:10808]
+VPN PORTS [9001, 443]
+PROXY PORTS [10808, 10809, 9050, 4444, 4447]
+DNS PORTS [5354, 5400, 8443]
+Custom DNS Server []
+Custom VPN Server []
+Custom Proxy Server [127.0.0.1:9050]
+Firewall Rules [BLOCK_DOMAIN:telemetry.microsoft.com, BLOCK_DOMAIN:graph.facebook.com]
+Allowed DNS Records [A, AAAA, CNAME, TXT]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+DNSCrypt Relays [sdns://gQ8xNDYuNzAuODIuMzo0NDM, sdns://gRE3NS4xMTkuMTQ0LjA6ODQ0Mw]
+Forwarding Rules [onion 127.0.0.1:5400]
+Cloaking Rules [stats.i2p=127.0.0.1, reg.i2p=127.0.0.1]
+Ignored Qtypes [DNSKEY, NS, SOA]
+===========
+Tor enabled=true
+DNSCrypt-Module-Enabled=true
+I2P-Enabled=true
+Mode=Tor+DNSCrypt+I2P
+Name=InviZible-TriModule-v3
+Proxy mode=Orbot-Tor
+DNS Mode=DNSCrypt
+Quad9=Security
+DNSCrypt=Adguard
+DNS-over-TLS=ControlD
+DNS-Proxy=Orbot
+Tunnel=None
+Connect-from-mode=Direct
+===========
+DNSCrypt-Listen-Port=5354
+DNSCrypt-Require-DNSSEC=true
+DNSCrypt-Require-NoLog=true
+DNSCrypt-HTTP3=true
+DNSCrypt-Block-Unqualified=true
+DNSCrypt-Block-Undelegated=true
+DNSCrypt-Query-Logging=true
+DNSCrypt-Suspicious-Logging=true
+I2P-HTTP-Proxy-Enabled=true
+I2P-SOCKS-Proxy-Enabled=true
+Tor-Isolate-UID=true
+Tor-Isolate-Dest-Addr=true
+Tor-Snowflake-Rendezvous=AMP Cache
+ARP-Spoofing-Detection=true
+Prevent-Device-Sleep=true
+Enable-Script-Control=true
+===========

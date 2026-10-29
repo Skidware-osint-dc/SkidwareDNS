@@ -1,0 +1,38 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v2.0
+# Preset: SSH + DNS (DNSTT) Stealth Tunnel
+
+===========
+DNS Servers [9.9.9.9:53, 2620:fe::fe:53]
+VPN Servers [ssh-dnstt.skid.example:22]
+Addresses [10.213.53.2/24]
+SOCKS5 [127.0.0.1:10808]
+VPN PORTS [22, 2222, 443]
+PROXY PORTS [10808, 10809]
+DNS PORTS [53, 5300, 5353]
+Custom DNS Server [9.9.9.9:53]
+Custom VPN Server [ssh-dnstt.skid.example:22]
+Custom Proxy Server []
+Firewall Rules [BLOCK_PORT:445]
+Allowed DNS Records [A, AAAA, TXT, CNAME]
+On-Device Blocklists [oisd_small]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=SSH-DNSTT-SlowDNS
+Proxy mode=SOCKS5
+DNS Mode=DNS-Proxy
+Quad9=Standard
+DNSCrypt=Cleanbrowsing Family
+DNS-over-TLS=Cloudflare Family
+DNS-Proxy=Quad9
+Tunnel=SSH
+Connect-from-mode=DNS (DNSTT)
+===========
+Tunnel-Host=ssh-dnstt.skid.example
+Tunnel-Port=22
+Tunnel-User=skidroot
+DNSTT-Domain=t.skiddns.example
+DNSTT-PubKey=9b4e1120a5c8f0e4718293a4b5c6d7e8f90123456789abcdef9876543210abcd
+UDP-EDNS-Payload=1232
+Shorter-TCP-Keepalive=true
+===========

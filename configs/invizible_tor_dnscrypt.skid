@@ -1,0 +1,42 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v2.0
+# Preset: InviZible Multi-Layer Anonymity
+
+===========
+DNS Servers [127.0.0.1:5400, sdns://AQMAAAAAAAAADDkuOS45Ljk6ODQ0MyBnyEe4yHWM0SAkVUO-dWdG3zTfHYTAC4xHA2jfgh2GPhkyLmRuc2NyeXB0LWNlcnQucXVhZDkubmV0]
+VPN Servers []
+Addresses [10.213.40.2/24, fd00:534b:4944::2/64]
+SOCKS5 [127.0.0.1:9050, 127.0.0.1:10808]
+VPN PORTS [9001, 443]
+PROXY PORTS [10808, 10809, 9050, 4444]
+DNS PORTS [5400, 8443, 53]
+Custom DNS Server [127.0.0.1:5400]
+Custom VPN Server []
+Custom Proxy Server [127.0.0.1:9050]
+Firewall Rules [BLOCK_DOMAIN:telemetry.microsoft.com, BLOCK_DOMAIN:analytics.google.com, BLOCK_PORT:6881]
+Allowed DNS Records [A, AAAA, CNAME, TXT]
+On-Device Blocklists [Adware & Trackers, OEM Telemetry]
+===========
+Tor enabled=true
+Mode=Tor+DNSCrypt+VPN
+Name=InviZible-Onion-Shield
+Proxy mode=Orbot-Tor
+DNS Mode=DNSCrypt
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=ControlD
+DNS-Proxy=Orbot
+Tunnel=Shadowsocks
+Connect-from-mode=TLS/SSL (Obfs)
+===========
+Global-DNS-Category=Other DNS
+On-Device-Blocklists-Enabled=true
+Split-DNS=true
+Prevent-DNS-Leaks=true
+Tor-Bridge-Type=obfs4
+I2P-Enabled=true
+UDP-QUIC-Policy=Block-Force-TCP
+UDP-Randomize-Source-Port=true
+Block-UDP-NonDNS=true
+Block-Bypassed-DNS=true
+Stall-On-Network-Loss=true
+===========
