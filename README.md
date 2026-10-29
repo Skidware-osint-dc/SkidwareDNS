@@ -1,6 +1,29 @@
-# SkidwareDNS v5.3 ("Hex Mark + Relays") — `5.3.0-skid` (`versionCode 530`)
+# SkidwareDNS v5.4 ("Socket Stack") — `5.4.0-skid` (`versionCode 540`)
 
-**SkidwareDNS v5.3** is an Android VPN, 5-hop Sphinx mixnet tuner, encrypted DNS router, multi-hop tunnel forge, anti-censorship packet shaper, and universal firewall (`com.skidwaredns.app`) powered by the human-readable **`.skid` Custom Config** format.
+**SkidwareDNS v5.4** is an Android VPN, 5-hop Sphinx mixnet tuner, encrypted DNS router, multi-hop tunnel forge, anti-censorship packet shaper, and universal firewall (`com.skidwaredns.app`) powered by the human-readable **`.skid` Custom Config** format.
+
+## What's New in v5.4 (Handlers, HTTPS, Ports, accurate icons)
+
+### 1. Shared `SocketStack` handlers
+Every SOCKS/HTTP listener, outbound TCP stream, UDP datagram, and TLS handshake now goes through one handler: `SO_RCVBUF`/`SO_SNDBUF`, `TCP_NODELAY` / cork, keepalive, linger/RST, reuse, DSCP, connect timeout, UDP broadcast/connected-mode, ephemeral source ports, and port-knock probes.
+
+### 2. More TCP & UDP settings
+Configure adds congestion (Cubic/BBR/Westwood/Reno), connect timeout, keepalive idle/interval, `SO_REUSEADDR`, `TCP_CORK`, window scaling, `TCP_USER_TIMEOUT`, UDP recv timeout, max datagram, connected datagrams, broadcast, and GSO hint.
+
+### 3. HTTPS / TLS screen
+Minimum TLS 1.2/1.3, ALPN (`h2,http/1.1` / `h3`), handshake timeout, SNI, hostname endpoint-id, HTTP/2, HTTP/1.1 fallback, session tickets, optional SHA-256 pin, HTTPS listen port. `SocketStack.openTls` applies SNI + ALPN on API 24/29.
+
+### 4. Dedicated Ports section
+VPN / Proxy / DNS listen lists, allow/block (ranges), `src>dst` forward map, knock sequence, ephemeral range, `SO_REUSEPORT`, loopback-only bind, privileged-port protect, well-known exceptions, port hop, remap DNS `:53` → DoH `:443`. Firewall returns `PORT_POLICY` on blocked dest ports.
+
+### 5. SkidIcons redraw
+70+ glyphs plus PORT / HTTPS / SOCKET, drawn on a 24-unit grid with 3-unit padding, 2× supersampled, no `Path.op`, no clipping. Hexagon-U, house, bars, chevrons, lock, shield, wifi, moon crescent, and hash/# port mark are rebuilt so 18 dp rows stay sharp.
+
+v1.0–v5.3 `.skid` keys still round-trip; new keys serialize after the existing TCP/UDP block.
+
+---
+
+**SkidwareDNS v5.3** shipped the official **hexagon-U launcher icon**, vector icons on every button / nav / tile / switch-row, **sky-blue switch tints**, and **14 new Mullvad relays** (Sofia DAITA, Nicosia, Copenhagen 100G, Helsinki 40G, London 100G, Tel Aviv) — all byte-checked against `https://api.mullvad.net/www/relays/all/`.
 
 Version **5.3** ships the official **hexagon-U launcher icon**, vector icons on every button / nav / tile / switch-row, **sky-blue switch tints**, and **14 new Mullvad relays** (Sofia DAITA, Nicosia, Copenhagen 100G, Helsinki 40G, London 100G, Tel Aviv) — all byte-checked against `https://api.mullvad.net/www/relays/all/`.
 
@@ -191,7 +214,7 @@ The tool count grew to 25 screens across five vendors; v5.2 reorganises them ins
 
 ```bash
 ./build_apk.sh
-# Outputs v5.3 (530 / 5.3.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
+# Outputs v5.4 (540 / 5.4.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
 
 # Host-JVM verification + .skid preset export (81 checks)
 java -cp <classes> VerifySkidV51 /home/user/SkidwareDNS/configs

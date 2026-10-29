@@ -118,6 +118,50 @@ public final class VerifySkidV51 {
         cfg.mullvadDaita = true;
         check(cfg.mullvadSshSha256Pin.startsWith("SHA256:"), "SSH SHA256 bridge pin stored");
 
+        System.out.println("== 4. v5.4 socket / HTTPS / port .skid round-trip ==");
+        SkidConfig t = new SkidConfig();
+        t.tcpCongestion = "BBR";
+        t.tcpConnectTimeoutMs = 15000;
+        t.tcpCork = true;
+        t.udpRecvTimeoutMs = 5000;
+        t.udpBroadcast = true;
+        t.httpsMinTls = "TLS 1.3";
+        t.httpsAlpn = "h2";
+        t.httpsHttp2 = false;
+        t.portBlockList = "445,135";
+        t.portAllowList = "443,853";
+        t.portForwardMap = "8080>80";
+        t.portKnockSequence = "7000,8000";
+        t.ephemeralPortMin = 30000;
+        t.portHopEnabled = true;
+        t.remapDns53toDoH = true;
+        String ser = SkidConfigParser.serialize(t);
+        SkidConfig t2 = SkidConfigParser.parse(ser).config;
+        check("BBR".equals(t2.tcpCongestion), "TCP-Congestion=BBR");
+        check(t2.tcpConnectTimeoutMs == 15000, "TCP-ConnectTimeout-Ms=15000");
+        check(t2.tcpCork, "TCP-Cork=true");
+        check(t2.udpRecvTimeoutMs == 5000, "UDP-RecvTimeout-Ms=5000");
+        check(t2.udpBroadcast, "UDP-Broadcast=true");
+        check("TLS 1.3".equals(t2.httpsMinTls), "HTTPS-MinTLS=TLS 1.3");
+        check("h2".equals(t2.httpsAlpn), "HTTPS-ALPN=h2");
+        check(!t2.httpsHttp2, "HTTPS-HTTP2=false");
+        check("445,135".equals(t2.portBlockList), "Port-Block-List");
+        check("443,853".equals(t2.portAllowList), "Port-Allow-List");
+        check("8080>80".equals(t2.portForwardMap), "Port-Forward-Map");
+        check("7000,8000".equals(t2.portKnockSequence), "Port-Knock-Sequence");
+        check(t2.ephemeralPortMin == 30000, "Ephemeral-Port-Min");
+        check(t2.portHopEnabled, "Port-Hop-Enabled");
+        check(t2.remapDns53toDoH, "Remap-DNS53-to-DoH");
+        check(t2.bindLoopbackOnly, "Bind-Loopback-Only default true");
+        check(t2.httpsEndpointId, "HTTPS-EndpointId default true");
+        SkidConfigParser.ParseResult oldRt = SkidConfigParser.parse(
+                "Name=legacy\nTCP-NoDelay=false\nUDP-QUIC-Policy=Block\n");
+        check(oldRt.valid && !oldRt.config.tcpNoDelay && oldRt.config.udpQuicPolicy.contains("Block"),
+                "v5.3 TCP/UDP keys still parse");
+        String oldSer = SkidConfigParser.serialize(oldRt.config);
+        check(oldSer.contains("TCP-NoDelay=false") && oldSer.contains("HTTPS-MinTLS="),
+                "legacy serialize keeps old keys and adds v5.4 keys");
+
         System.out.println();
         System.out.println(failures == 0 ? "PASS: VerifySkidV51 (" + checks + " checks)"
                 : "FAIL: " + failures + "/" + checks + " checks");

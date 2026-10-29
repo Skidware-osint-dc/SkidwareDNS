@@ -628,7 +628,7 @@ public final class DnsUpstreamResolver {
             InetAddress addr = InetAddress.getByName(hp.host);
 
             if (cfg != null && cfg.udpRandomizeSourcePort) {
-                int ephemPort = 20000 + RNG.nextInt(40000);
+                int ephemPort = com.skidwaredns.app.proxy.SocketStack.ephemeralPort(cfg);
                 try {
                     udp = new DatagramSocket(ephemPort);
                 } catch (Exception e) {
@@ -646,7 +646,7 @@ public final class DnsUpstreamResolver {
             DatagramPacket outPkt = new DatagramPacket(dnsQuery, dnsQuery.length, addr, hp.port);
             udp.send(outPkt);
 
-            int maxUdp = (cfg != null) ? Math.max(1232, cfg.udpEdnsPayloadBytes) : 4096;
+            int maxUdp = (cfg != null) ? Math.max(cfg.udpMaxDatagramBytes, cfg.udpEdnsPayloadBytes) : 4096;
             byte[] buf = new byte[Math.max(4096, maxUdp)];
             DatagramPacket inPkt = new DatagramPacket(buf, buf.length);
             udp.receive(inPkt);
@@ -695,41 +695,11 @@ public final class DnsUpstreamResolver {
     }
 
     public static void applyTcpSocketTuning(Socket s, SkidConfig cfg) {
-        if (s == null) return;
-        try {
-            int timeoutMs = getSocketTimeoutMs(cfg);
-            s.setSoTimeout(timeoutMs);
-            if (cfg != null) {
-                s.setTcpNoDelay(cfg.tcpNoDelay);
-                s.setKeepAlive(cfg.shorterTcpKeepalive);
-                int bufBytes = Math.max(65536, cfg.socketBufferSizeKb * 1024);
-                s.setReceiveBufferSize(bufBytes);
-                s.setSendBufferSize(bufBytes);
-                s.setTrafficClass(cfg.getTrafficClassByte());
-                if (cfg.tcpRstQuickClose) {
-                    s.setSoLinger(true, 0);
-                }
-            }
-        } catch (Exception ignored) {
-        }
+        com.skidwaredns.app.proxy.SocketStack.applyTcp(s, cfg);
     }
 
     public static void applyUdpSocketTuning(DatagramSocket udp, SkidConfig cfg) {
-        if (udp == null) return;
-        try {
-            int timeoutMs = DEFAULT_TIMEOUT_MS;
-            if (cfg != null) {
-                if (cfg.idleTimeoutSec > 0) {
-                    timeoutMs = Math.min(15000, cfg.idleTimeoutSec * 1000);
-                }
-                int bufBytes = Math.max(65536, cfg.socketBufferSizeKb * 1024);
-                udp.setReceiveBufferSize(bufBytes);
-                udp.setSendBufferSize(bufBytes);
-                udp.setTrafficClass(cfg.getTrafficClassByte());
-            }
-            udp.setSoTimeout(timeoutMs);
-        } catch (Exception ignored) {
-        }
+        com.skidwaredns.app.proxy.SocketStack.applyUdp(udp, cfg);
     }
 
     /**
@@ -766,10 +736,7 @@ public final class DnsUpstreamResolver {
     }
 
     private static int getSocketTimeoutMs(SkidConfig cfg) {
-        if (cfg != null && cfg.idleTimeoutSec > 0) {
-            return Math.min(30000, Math.max(2500, cfg.idleTimeoutSec * 1000));
-        }
-        return DEFAULT_TIMEOUT_MS;
+        return com.skidwaredns.app.proxy.SocketStack.connectTimeoutMs(cfg);
     }
 
     private static boolean cfgLoopback(SkidConfig cfg) {

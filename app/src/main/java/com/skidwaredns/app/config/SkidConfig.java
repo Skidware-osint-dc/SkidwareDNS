@@ -219,6 +219,48 @@ public final class SkidConfig {
     public boolean udpStrictChecksum = true;
     public int udpEdnsPayloadBytes = 1232;
 
+    // === Section 3B2: v5.4 Socket / HTTPS / Port handlers ===
+    public int tcpKeepaliveIdleSec = 45;
+    public int tcpKeepaliveIntervalSec = 15;
+    public boolean tcpReuseAddress = true;
+    public boolean tcpCork = false;
+    public int tcpUserTimeoutMs = 0;
+    public String tcpCongestion = "Cubic";
+    public boolean tcpWindowScaling = true;
+    public int tcpConnectTimeoutMs = 8000;
+
+    public int udpRecvTimeoutMs = 3000;
+    public boolean udpBroadcast = false;
+    public boolean udpConnectedMode = true;
+    public int udpMaxDatagramBytes = 1400;
+    public boolean udpReuseAddress = true;
+    public boolean udpGsoHint = false;
+
+    public String httpsMinTls = "TLS 1.2";
+    public String httpsAlpn = "h2,http/1.1";
+    public boolean httpsSessionTickets = true;
+    public boolean httpsHttp2 = true;
+    public int httpsTimeoutMs = 10000;
+    public boolean httpsEndpointId = true;
+    public boolean httpsSniEnabled = true;
+    public String httpsPinSha256 = "";
+    public boolean httpsFallbackHttp11 = true;
+
+    public String portAllowList = "";
+    public String portBlockList = "135,137,139,445,1900,5353";
+    public String portForwardMap = "";
+    public String portKnockSequence = "";
+    public int ephemeralPortMin = 20000;
+    public int ephemeralPortMax = 60000;
+    public boolean soReusePort = true;
+    public boolean bindLoopbackOnly = true;
+    public boolean privilegedPortProtect = true;
+    public boolean portHopEnabled = false;
+    public String portHopRange = "10000-60000";
+    public boolean remapDns53toDoH = false;
+    public int httpsListenPort = 10443;
+    public boolean allowWellKnownPorts = true;
+
     // === Section 3C: Anti-Censorship DPI + LBox TLS Fragmentation & SNI Shaping ===
     public String dpiStrategy = "Always";   // None, Auto, Always
     public String dpiTechnique = "Auto";    // None, Auto, TCP, TCP/TLS, Desync, Hybrid

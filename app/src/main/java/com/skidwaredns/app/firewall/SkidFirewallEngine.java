@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.PowerManager;
 
 import com.skidwaredns.app.config.SkidConfig;
+import com.skidwaredns.app.proxy.SocketStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,6 +162,7 @@ public final class SkidFirewallEngine {
     private boolean stallOnNetworkLoss;
     private String udpQuicPolicy = "Allow";
     private String ipVersion = "IPv4";
+    private SkidConfig liveCfg;
 
     public synchronized void reloadFromConfig(SkidConfig cfg) {
         allowDomains.clear();
@@ -172,6 +174,7 @@ public final class SkidFirewallEngine {
         allowedQtypes.clear();
 
         if (cfg == null) return;
+        this.liveCfg = cfg;
         this.blockScreenLocked = cfg.blockScreenLocked;
         this.blockMetered = cfg.blockMetered;
         this.blockUdpNonDns = cfg.blockUdpNonDns;
@@ -326,6 +329,10 @@ public final class SkidFirewallEngine {
     public synchronized Verdict evaluateDestination(Context ctx, String hostOrIp, int dstPort, boolean isUdp) {
         Verdict univ = checkUniversalState(ctx);
         if (!univ.allowed) return univ;
+
+        if (!SocketStack.isPortAllowed(liveCfg, dstPort, isUdp)) {
+            return Verdict.block("PORT_POLICY:" + dstPort);
+        }
 
         if (isUdp && dstPort == 443 && udpQuicPolicy.toLowerCase(Locale.US).contains("block")) {
             return Verdict.block("BLOCK_QUIC_UDP_443");

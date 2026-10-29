@@ -49,6 +49,8 @@ public final class ConfigureScreens {
     public static final int SUB_NETWORK = 7;
     public static final int SUB_GENERAL = 8;
     public static final int SUB_LOGS_SETTINGS = 9;
+    public static final int SUB_HTTPS = 25;
+    public static final int SUB_PORTS = 26;
 
     public interface HostCallbacks {
         SkidConfig getConfig();
@@ -71,6 +73,8 @@ public final class ConfigureScreens {
             case SUB_FIREWALL: return buildFirewallScreen(ctx, host);
             case SUB_PROXY: return buildProxyAndTunnelScreen(ctx, host);
             case SUB_TCPIP_UDP: return buildTcpIpUdpScreen(ctx, host);
+            case SUB_HTTPS: return buildHttpsScreen(ctx, host);
+            case SUB_PORTS: return buildPortsScreen(ctx, host);
             case SUB_ANTICENSORSHIP: return buildAntiCensorshipScreen(ctx, host);
             case SUB_NETWORK: return buildNetworkScreen(ctx, host);
             case SUB_GENERAL: return buildGeneralSettingsScreen(ctx, host);
@@ -128,7 +132,7 @@ public final class ConfigureScreens {
         headLeft.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         headLeft.addView(UiFactory.label(ctx, "Configure", 22f, UiFactory.COLOR_TEXT, true, false));
         headLeft.addView(UiFactory.label(ctx, "Every tool, one place \u2022 search or drill in", 12f, UiFactory.COLOR_MUTED, false, false));
-        TextView verChip = UiFactory.counterChip(ctx, "v5.3", UiFactory.COLOR_SKY);
+        TextView verChip = UiFactory.counterChip(ctx, "v5.4", UiFactory.COLOR_SKY);
         LinearLayout headRight = new LinearLayout(ctx);
         headRight.setOrientation(LinearLayout.HORIZONTAL);
         headRight.setGravity(Gravity.CENTER_VERTICAL);
@@ -310,10 +314,16 @@ public final class ConfigureScreens {
         // ================= 5. PERFORMANCE ==========================
         List<UiFactory.SettingEntry> perf = new ArrayList<>();
         perf.add(new UiFactory.SettingEntry("\u2699", "TCP / IP & UDP",
-                "Buffer " + cfg.socketBufferSizeKb + " KB \u2022 MSS, QUIC, keepalive", UiFactory.COLOR_AMBER, 0,
-                navTo(host, SUB_TCPIP_UDP)));
+                "Buffer " + cfg.socketBufferSizeKb + " KB \u2022 " + cfg.tcpCongestion + " \u2022 keepalive " + cfg.tcpKeepaliveIdleSec + "s",
+                UiFactory.COLOR_AMBER, 0, navTo(host, SUB_TCPIP_UDP)));
+        perf.add(new UiFactory.SettingEntry("\uD83D\uDD10", "HTTPS / TLS",
+                cfg.httpsMinTls + " \u2022 ALPN " + cfg.httpsAlpn + " \u2022 " + cfg.httpsTimeoutMs + " ms",
+                UiFactory.COLOR_AMBER, 0, navTo(host, SUB_HTTPS)));
+        perf.add(new UiFactory.SettingEntry("#", "Ports",
+                "block " + cfg.portBlockList + " \u2022 SOCKS :" + cfg.getPrimaryLocalSocksPort(),
+                UiFactory.COLOR_AMBER, 0, navTo(host, SUB_PORTS)));
         addSection(ctx, host, holder, "\u26A1", "Performance & Sockets",
-                "Buffers, NAT, MSS and transport tuning", UiFactory.COLOR_AMBER, perf, query, false);
+                "Buffers, TLS, NAT, MSS and port policy", UiFactory.COLOR_AMBER, perf, query, false);
 
         // ================= 6. APP & DIAGNOSTICS ====================
         List<UiFactory.SettingEntry> app = new ArrayList<>();
@@ -1432,6 +1442,192 @@ public final class ConfigureScreens {
                 }));
         col.addView(advUdp);
 
+        col.addView(UiFactory.categoryTitle(ctx, "TCP handlers (v5.4)"));
+        LinearLayout tcp2 = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
+        tcp2.addView(UiFactory.iconNavRow(ctx, "\u26A1", "Congestion control",
+                cfg.tcpCongestion + " (Cubic / BBR / Westwood / Reno)", UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "TCP congestion",
+                                new String[]{"Cubic", "BBR", "Westwood", "Reno"},
+                                cfg.tcpCongestion, new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.tcpCongestion = val;
+                                        host.persistAndReload("TCP-Congestion=" + val);
+                                        host.openConfigureSubScreen(SUB_TCPIP_UDP);
+                                    }
+                                });
+                    }
+                }));
+        tcp2.addView(UiFactory.divider(ctx));
+        tcp2.addView(UiFactory.iconNavRow(ctx, "\u23F1", "Connect timeout",
+                cfg.tcpConnectTimeoutMs + " ms", UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "TCP connect timeout",
+                                new String[]{"2000", "5000", "8000", "15000", "30000"},
+                                String.valueOf(cfg.tcpConnectTimeoutMs), new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.tcpConnectTimeoutMs = Integer.parseInt(val);
+                                        host.persistAndReload("TCP-ConnectTimeout-Ms=" + val);
+                                        host.openConfigureSubScreen(SUB_TCPIP_UDP);
+                                    }
+                                });
+                    }
+                }));
+        tcp2.addView(UiFactory.divider(ctx));
+        tcp2.addView(UiFactory.iconNavRow(ctx, "\u23F3", "Keepalive idle / interval",
+                cfg.tcpKeepaliveIdleSec + "s idle \u00b7 " + cfg.tcpKeepaliveIntervalSec + "s probe",
+                UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "TCP keepalive idle (seconds)",
+                                new String[]{"15", "30", "45", "60", "120"},
+                                String.valueOf(cfg.tcpKeepaliveIdleSec), new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.tcpKeepaliveIdleSec = Integer.parseInt(val);
+                                        host.persistAndReload("TCP-Keepalive-Idle-Sec=" + val);
+                                        host.openConfigureSubScreen(SUB_TCPIP_UDP);
+                                    }
+                                });
+                    }
+                }));
+        tcp2.addView(UiFactory.divider(ctx));
+        tcp2.addView(UiFactory.iconSwitchRow(ctx, "\u21BB", "SO_REUSEADDR",
+                "Allow local address reuse on TCP sockets.",
+                cfg.tcpReuseAddress, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.tcpReuseAddress = checked;
+                        host.persistAndReload("TCP-ReuseAddress=" + checked);
+                    }
+                }));
+        tcp2.addView(UiFactory.divider(ctx));
+        tcp2.addView(UiFactory.iconSwitchRow(ctx, "\u25A6", "TCP_CORK (Nagle hold)",
+                "Hold small writes to fill a segment. Disables TCP_NODELAY while on.",
+                cfg.tcpCork, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.tcpCork = checked;
+                        host.persistAndReload("TCP-Cork=" + checked);
+                    }
+                }));
+        tcp2.addView(UiFactory.divider(ctx));
+        tcp2.addView(UiFactory.iconSwitchRow(ctx, "\u2194", "Window scaling",
+                "Hint RFC 1323 window scaling on high-BDP paths.",
+                cfg.tcpWindowScaling, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.tcpWindowScaling = checked;
+                        host.persistAndReload("TCP-WindowScaling=" + checked);
+                    }
+                }));
+        tcp2.addView(UiFactory.divider(ctx));
+        tcp2.addView(UiFactory.iconNavRow(ctx, "\u23F1", "TCP user timeout",
+                cfg.tcpUserTimeoutMs == 0 ? "Off (use idle timeout)" : cfg.tcpUserTimeoutMs + " ms",
+                UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "TCP_USER_TIMEOUT (ms)",
+                                new String[]{"0", "5000", "15000", "30000", "60000"},
+                                String.valueOf(cfg.tcpUserTimeoutMs), new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.tcpUserTimeoutMs = Integer.parseInt(val);
+                                        host.persistAndReload("TCP-UserTimeout-Ms=" + val);
+                                        host.openConfigureSubScreen(SUB_TCPIP_UDP);
+                                    }
+                                });
+                    }
+                }));
+        col.addView(tcp2);
+
+        col.addView(UiFactory.categoryTitle(ctx, "UDP handlers (v5.4)"));
+        LinearLayout udp2 = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
+        udp2.addView(UiFactory.iconNavRow(ctx, "\u23F1", "UDP receive timeout",
+                cfg.udpRecvTimeoutMs + " ms", UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "UDP recv timeout (ms)",
+                                new String[]{"500", "1000", "3000", "5000", "15000"},
+                                String.valueOf(cfg.udpRecvTimeoutMs), new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.udpRecvTimeoutMs = Integer.parseInt(val);
+                                        host.persistAndReload("UDP-RecvTimeout-Ms=" + val);
+                                        host.openConfigureSubScreen(SUB_TCPIP_UDP);
+                                    }
+                                });
+                    }
+                }));
+        udp2.addView(UiFactory.divider(ctx));
+        udp2.addView(UiFactory.iconNavRow(ctx, "\uD83D\uDCE6", "Max datagram",
+                cfg.udpMaxDatagramBytes + " bytes", UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "UDP max datagram",
+                                new String[]{"512", "1232", "1400", "1500", "4096"},
+                                String.valueOf(cfg.udpMaxDatagramBytes), new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.udpMaxDatagramBytes = Integer.parseInt(val);
+                                        host.persistAndReload("UDP-MaxDatagram-Bytes=" + val);
+                                        host.openConfigureSubScreen(SUB_TCPIP_UDP);
+                                    }
+                                });
+                    }
+                }));
+        udp2.addView(UiFactory.divider(ctx));
+        udp2.addView(UiFactory.iconSwitchRow(ctx, "\u21BB", "SO_REUSEADDR (UDP)",
+                "Reuse local UDP bind addresses.",
+                cfg.udpReuseAddress, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.udpReuseAddress = checked;
+                        host.persistAndReload("UDP-ReuseAddress=" + checked);
+                    }
+                }));
+        udp2.addView(UiFactory.divider(ctx));
+        udp2.addView(UiFactory.iconSwitchRow(ctx, "((•))", "Connected datagrams",
+                "connect() UDP sockets to a single peer for faster send/recv.",
+                cfg.udpConnectedMode, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.udpConnectedMode = checked;
+                        host.persistAndReload("UDP-ConnectedMode=" + checked);
+                    }
+                }));
+        udp2.addView(UiFactory.divider(ctx));
+        udp2.addView(UiFactory.iconSwitchRow(ctx, "\uD83D\uDCE2", "UDP broadcast",
+                "Allow SO_BROADCAST on datagram sockets.",
+                cfg.udpBroadcast, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.udpBroadcast = checked;
+                        host.persistAndReload("UDP-Broadcast=" + checked);
+                    }
+                }));
+        udp2.addView(UiFactory.divider(ctx));
+        udp2.addView(UiFactory.iconSwitchRow(ctx, "\u26A1", "UDP GSO hint",
+                "Hint generic segmentation offload on large datagrams (best-effort).",
+                cfg.udpGsoHint, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.udpGsoHint = checked;
+                        host.persistAndReload("UDP-GSO-Hint=" + checked);
+                    }
+                }));
+        col.addView(udp2);
+
         sv.addView(col);
         return sv;
     }
@@ -2113,6 +2309,319 @@ public final class ConfigureScreens {
                 host.openConfigureSubScreen(SUB_HUB);
             }
         };
+    }
+
+    private static View buildHttpsScreen(final Context ctx, final HostCallbacks host) {
+        ScrollView sv = wrapScroll(ctx);
+        LinearLayout col = innerCol(ctx);
+        final SkidConfig cfg = host.getConfig();
+
+        col.addView(UiFactory.backHeader(ctx, "HTTPS / TLS",
+                "SNI, ALPN, TLS 1.2/1.3, session tickets, endpoint-id", backToHub(host)));
+
+        col.addView(UiFactory.categoryTitle(ctx, "Protocol"));
+        LinearLayout proto = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
+        proto.addView(UiFactory.iconNavRow(ctx, "HTTPS", "Minimum TLS",
+                cfg.httpsMinTls, UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "Minimum TLS",
+                                new String[]{"TLS 1.2", "TLS 1.2 + 1.3", "TLS 1.3"},
+                                cfg.httpsMinTls, new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.httpsMinTls = val;
+                                        host.persistAndReload("HTTPS-MinTLS=" + val);
+                                        host.openConfigureSubScreen(SUB_HTTPS);
+                                    }
+                                });
+                    }
+                }));
+        proto.addView(UiFactory.divider(ctx));
+        proto.addView(UiFactory.iconNavRow(ctx, "\uD83D\uDD17", "ALPN",
+                cfg.httpsAlpn, UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "HTTPS ALPN",
+                                new String[]{"h2,http/1.1", "http/1.1", "h2", "h3,h2,http/1.1"},
+                                cfg.httpsAlpn, new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.httpsAlpn = val;
+                                        host.persistAndReload("HTTPS-ALPN=" + val);
+                                        host.openConfigureSubScreen(SUB_HTTPS);
+                                    }
+                                });
+                    }
+                }));
+        proto.addView(UiFactory.divider(ctx));
+        proto.addView(UiFactory.iconNavRow(ctx, "\u23F1", "Handshake timeout",
+                cfg.httpsTimeoutMs + " ms", UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "HTTPS timeout (ms)",
+                                new String[]{"3000", "5000", "10000", "15000", "30000"},
+                                String.valueOf(cfg.httpsTimeoutMs), new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.httpsTimeoutMs = Integer.parseInt(val);
+                                        host.persistAndReload("HTTPS-Timeout-Ms=" + val);
+                                        host.openConfigureSubScreen(SUB_HTTPS);
+                                    }
+                                });
+                    }
+                }));
+        col.addView(proto);
+
+        col.addView(UiFactory.categoryTitle(ctx, "Identity & sessions"));
+        LinearLayout id = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
+        id.addView(UiFactory.iconSwitchRow(ctx, "HTTPS", "Send SNI",
+                "Attach the configured SNI / hostname on the TLS ClientHello.",
+                cfg.httpsSniEnabled, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.httpsSniEnabled = checked;
+                        host.persistAndReload("HTTPS-SNI-Enabled=" + checked);
+                    }
+                }));
+        id.addView(UiFactory.divider(ctx));
+        id.addView(UiFactory.iconSwitchRow(ctx, "\u2713", "Endpoint identification",
+                "Verify the certificate hostname against the SNI peer.",
+                cfg.httpsEndpointId, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.httpsEndpointId = checked;
+                        host.persistAndReload("HTTPS-EndpointId=" + checked);
+                    }
+                }));
+        id.addView(UiFactory.divider(ctx));
+        id.addView(UiFactory.iconSwitchRow(ctx, "\uD83C\uDF10", "HTTP/2",
+                "Offer h2 in ALPN. Off forces HTTP/1.1 when fallback is on.",
+                cfg.httpsHttp2, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.httpsHttp2 = checked;
+                        host.persistAndReload("HTTPS-HTTP2=" + checked);
+                    }
+                }));
+        id.addView(UiFactory.divider(ctx));
+        id.addView(UiFactory.iconSwitchRow(ctx, "\u21BB", "Fallback HTTP/1.1",
+                "If HTTP/2 is off, advertise only http/1.1.",
+                cfg.httpsFallbackHttp11, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.httpsFallbackHttp11 = checked;
+                        host.persistAndReload("HTTPS-Fallback-HTTP11=" + checked);
+                    }
+                }));
+        id.addView(UiFactory.divider(ctx));
+        id.addView(UiFactory.iconSwitchRow(ctx, "\uD83C\uDFAB", "Session tickets",
+                "Allow TLS session resumption tickets.",
+                cfg.httpsSessionTickets, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.httpsSessionTickets = checked;
+                        host.persistAndReload("HTTPS-SessionTickets=" + checked);
+                    }
+                }));
+        col.addView(id);
+
+        col.addView(UiFactory.categoryTitle(ctx, "Pin & listen"));
+        LinearLayout pin = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
+        pin.addView(UiFactory.label(ctx, "Optional SHA-256 pin (hex or base64, empty = off):", 12f, UiFactory.COLOR_MUTED, false, false));
+        final EditText pinEt = UiFactory.monoInput(ctx, cfg.httpsPinSha256, "deadbeef... or Base64=", false);
+        pin.addView(pinEt);
+        pin.addView(UiFactory.iconNavRow(ctx, "#", "HTTPS listen port",
+                String.valueOf(cfg.httpsListenPort), UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "HTTPS listen port",
+                                new String[]{"0", "10443", "8443", "4443", "443"},
+                                String.valueOf(cfg.httpsListenPort), new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.httpsListenPort = Integer.parseInt(val);
+                                        host.persistAndReload("HTTPS-Listen-Port=" + val);
+                                        host.openConfigureSubScreen(SUB_HTTPS);
+                                    }
+                                });
+                    }
+                }));
+        Button savePin = UiFactory.actionButton(ctx, "Save pin", UiFactory.COLOR_CARD_SELECTED, UiFactory.COLOR_SKY, UiFactory.COLOR_SKY);
+        savePin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cfg.httpsPinSha256 = pinEt.getText().toString().trim();
+                host.persistAndReload("HTTPS-Pin-SHA256=" + cfg.httpsPinSha256);
+                Toast.makeText(ctx, "Saved HTTPS pin", Toast.LENGTH_SHORT).show();
+            }
+        });
+        pin.addView(savePin);
+        col.addView(pin);
+
+        col.addView(UiFactory.label(ctx, com.skidwaredns.app.proxy.SocketStack.describe(cfg),
+                11.5f, UiFactory.COLOR_SKY, false, true));
+
+        sv.addView(col);
+        return sv;
+    }
+
+    private static View buildPortsScreen(final Context ctx, final HostCallbacks host) {
+        ScrollView sv = wrapScroll(ctx);
+        LinearLayout col = innerCol(ctx);
+        final SkidConfig cfg = host.getConfig();
+
+        col.addView(UiFactory.backHeader(ctx, "Ports",
+                "Allow / block lists, forwarding, knock, hop, bind policy", backToHub(host)));
+
+        col.addView(UiFactory.categoryTitle(ctx, "Listen ports"));
+        LinearLayout listen = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
+        listen.addView(UiFactory.label(ctx, "VPN PORTS []  /  PROXY PORTS []  /  DNS PORTS []", 12f, UiFactory.COLOR_MUTED, false, false));
+        final EditText vpnPortsEt = UiFactory.monoInput(ctx, joinCsv(cfg.vpnPorts), "51820, 4500, 500, 1701, 443", false);
+        final EditText proxyPortsEt = UiFactory.monoInput(ctx, joinCsv(cfg.proxyPorts), "10808, 10809, 9050, 4444", false);
+        final EditText dnsPortsEt = UiFactory.monoInput(ctx, joinCsv(cfg.dnsPorts), "53, 853, 443, 5400", false);
+        listen.addView(UiFactory.label(ctx, "VPN:", 11f, UiFactory.COLOR_MUTED, false, false));
+        listen.addView(vpnPortsEt);
+        listen.addView(UiFactory.label(ctx, "Proxy (SOCKS, HTTP, Tor, I2P):", 11f, UiFactory.COLOR_MUTED, false, false));
+        listen.addView(proxyPortsEt);
+        listen.addView(UiFactory.label(ctx, "DNS:", 11f, UiFactory.COLOR_MUTED, false, false));
+        listen.addView(dnsPortsEt);
+        col.addView(listen);
+
+        col.addView(UiFactory.categoryTitle(ctx, "Policy"));
+        LinearLayout policy = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
+        policy.addView(UiFactory.label(ctx, "Allow list (empty = all except block). Ranges ok: 1000-2000", 12f, UiFactory.COLOR_MUTED, false, false));
+        final EditText allowEt = UiFactory.monoInput(ctx, cfg.portAllowList, "80,443,853,51820", false);
+        policy.addView(allowEt);
+        policy.addView(UiFactory.label(ctx, "Block list:", 12f, UiFactory.COLOR_MUTED, false, false));
+        final EditText blockEt = UiFactory.monoInput(ctx, cfg.portBlockList, "135,137,139,445,1900,5353", false);
+        policy.addView(blockEt);
+        policy.addView(UiFactory.label(ctx, "Forward map (src>dst):", 12f, UiFactory.COLOR_MUTED, false, false));
+        final EditText fwdEt = UiFactory.monoInput(ctx, cfg.portForwardMap, "8080>80, 8443>443", false);
+        policy.addView(fwdEt);
+        policy.addView(UiFactory.label(ctx, "Port-knock sequence:", 12f, UiFactory.COLOR_MUTED, false, false));
+        final EditText knockEt = UiFactory.monoInput(ctx, cfg.portKnockSequence, "7000,8000,9000", false);
+        policy.addView(knockEt);
+        col.addView(policy);
+
+        col.addView(UiFactory.categoryTitle(ctx, "Ephemeral & hop"));
+        LinearLayout eph = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
+        eph.addView(UiFactory.iconNavRow(ctx, "#", "Ephemeral range",
+                cfg.ephemeralPortMin + "\u2013" + cfg.ephemeralPortMax, UiFactory.COLOR_MUTED,
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showSingleChoiceDialog(ctx, "Ephemeral min",
+                                new String[]{"1024", "10000", "20000", "32768", "49152"},
+                                String.valueOf(cfg.ephemeralPortMin), new UiFactory.ChipSelectListener() {
+                                    @Override
+                                    public void onSelected(String val) {
+                                        cfg.ephemeralPortMin = Integer.parseInt(val);
+                                        if (cfg.ephemeralPortMax <= cfg.ephemeralPortMin) {
+                                            cfg.ephemeralPortMax = Math.min(65535, cfg.ephemeralPortMin + 10000);
+                                        }
+                                        host.persistAndReload("Ephemeral-Port-Min=" + val);
+                                        host.openConfigureSubScreen(SUB_PORTS);
+                                    }
+                                });
+                    }
+                }));
+        eph.addView(UiFactory.divider(ctx));
+        eph.addView(UiFactory.iconSwitchRow(ctx, "\u21BB", "SO_REUSEPORT",
+                "Share listen ports across handler sockets.",
+                cfg.soReusePort, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.soReusePort = checked;
+                        host.persistAndReload("SO-ReusePort=" + checked);
+                    }
+                }));
+        eph.addView(UiFactory.divider(ctx));
+        eph.addView(UiFactory.iconSwitchRow(ctx, "\uD83C\uDFE0", "Bind loopback only",
+                "Local SOCKS/HTTP listeners bind 127.0.0.1 instead of 0.0.0.0.",
+                cfg.bindLoopbackOnly, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.bindLoopbackOnly = checked;
+                        host.persistAndReload("Bind-Loopback-Only=" + checked);
+                    }
+                }));
+        eph.addView(UiFactory.divider(ctx));
+        eph.addView(UiFactory.iconSwitchRow(ctx, "\uD83D\uDD12", "Privileged-port protect",
+                "Refuse binds below 1024 unless well-known ports are allowed.",
+                cfg.privilegedPortProtect, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.privilegedPortProtect = checked;
+                        host.persistAndReload("Privileged-Port-Protect=" + checked);
+                    }
+                }));
+        eph.addView(UiFactory.divider(ctx));
+        eph.addView(UiFactory.iconSwitchRow(ctx, "\u2713", "Allow well-known ports",
+                "Permit 22/53/80/123/443/853 when privileged-port protect is on.",
+                cfg.allowWellKnownPorts, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.allowWellKnownPorts = checked;
+                        host.persistAndReload("Allow-WellKnown-Ports=" + checked);
+                    }
+                }));
+        eph.addView(UiFactory.divider(ctx));
+        eph.addView(UiFactory.iconSwitchRow(ctx, "\uD83C\uDFAF", "Port hop",
+                "Randomize outbound dest port inside hop range (UDP/QUIC style).",
+                cfg.portHopEnabled, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.portHopEnabled = checked;
+                        host.persistAndReload("Port-Hop-Enabled=" + checked);
+                    }
+                }));
+        eph.addView(UiFactory.divider(ctx));
+        eph.addView(UiFactory.label(ctx, "Hop range:", 12f, UiFactory.COLOR_MUTED, false, false));
+        final EditText hopEt = UiFactory.monoInput(ctx, cfg.portHopRange, "10000-60000", false);
+        eph.addView(hopEt);
+        eph.addView(UiFactory.divider(ctx));
+        eph.addView(UiFactory.iconSwitchRow(ctx, "\uD83C\uDF10", "Remap DNS :53 \u2192 DoH :443",
+                "Rewrite destination port 53 to 443 before the HTTPS handler.",
+                cfg.remapDns53toDoH, new UiFactory.ToggleListener() {
+                    @Override
+                    public void onToggled(boolean checked) {
+                        cfg.remapDns53toDoH = checked;
+                        host.persistAndReload("Remap-DNS53-to-DoH=" + checked);
+                    }
+                }));
+        col.addView(eph);
+
+        Button save = UiFactory.actionButton(ctx, "Save ports", UiFactory.COLOR_CARD_SELECTED, UiFactory.COLOR_SKY, UiFactory.COLOR_SKY);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                parseCsvInto(cfg.vpnPorts, vpnPortsEt.getText().toString());
+                parseCsvInto(cfg.proxyPorts, proxyPortsEt.getText().toString());
+                parseCsvInto(cfg.dnsPorts, dnsPortsEt.getText().toString());
+                cfg.portAllowList = allowEt.getText().toString().trim();
+                cfg.portBlockList = blockEt.getText().toString().trim();
+                cfg.portForwardMap = fwdEt.getText().toString().trim();
+                cfg.portKnockSequence = knockEt.getText().toString().trim();
+                cfg.portHopRange = hopEt.getText().toString().trim();
+                host.persistAndReload("Saved Port policy");
+                Toast.makeText(ctx, "Saved ports & policy", Toast.LENGTH_SHORT).show();
+            }
+        });
+        col.addView(save);
+
+        col.addView(UiFactory.label(ctx, "SOCKS :" + cfg.getPrimaryLocalSocksPort()
+                        + "  HTTP :" + cfg.getPrimaryLocalHttpPort()
+                        + "  DNS :" + cfg.getPrimaryDnsPort()
+                        + "  HTTPS listen :" + cfg.httpsListenPort,
+                11.5f, UiFactory.COLOR_SKY, false, true));
+
+        sv.addView(col);
+        return sv;
     }
 
     private static ScrollView wrapScroll(Context ctx) {

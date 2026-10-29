@@ -103,8 +103,7 @@ public final class LocalProxyEngine {
     private void runSocksAcceptLoop(int port) {
         try {
             socksServer = new ServerSocket();
-            socksServer.setReuseAddress(true);
-            socksServer.bind(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), port), 64);
+            SocketStack.bindLocal(socksServer, port, config);
             SkidEventBus.logSystem("PROXY", "127.0.0.1:" + port, "SOCKS5 listener online");
 
             while (running.get()) {
@@ -130,8 +129,7 @@ public final class LocalProxyEngine {
     private void runHttpAcceptLoop(int port) {
         try {
             httpServer = new ServerSocket();
-            httpServer.setReuseAddress(true);
-            httpServer.bind(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), port), 64);
+            SocketStack.bindLocal(httpServer, port, config);
             SkidEventBus.logSystem("PROXY", "127.0.0.1:" + port, "HTTP CONNECT proxy online");
 
             while (running.get()) {

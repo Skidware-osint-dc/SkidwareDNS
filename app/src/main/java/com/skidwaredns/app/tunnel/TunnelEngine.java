@@ -6,6 +6,7 @@ import com.skidwaredns.app.config.SkidConfig;
 import com.skidwaredns.app.dns.DnsPacketCodec;
 import com.skidwaredns.app.dns.DnsUpstreamResolver;
 import com.skidwaredns.app.model.DnsPresets;
+import com.skidwaredns.app.proxy.SocketStack;
 import com.skidwaredns.app.util.NetDiagnosticsAndMitm;
 import com.skidwaredns.app.util.SkidEventBus;
 
@@ -44,7 +45,9 @@ public final class TunnelEngine {
         }
     }
 
-    private static final int CONNECT_TIMEOUT_MS = 5000;
+    private static int connectTimeout(SkidConfig cfg) {
+        return SocketStack.connectTimeoutMs(cfg);
+    }
     private static final Random RNG = new Random();
 
     private TunnelEngine() {}
@@ -53,6 +56,13 @@ public final class TunnelEngine {
         NymMixnetAndCensorshipEngine.applyPacketMixingDelayIfActive(cfg);
         String fakeMapped = NetDiagnosticsAndMitm.lookupFakeIpDomain(rawTargetHost);
         String targetHost = fakeMapped != null ? fakeMapped : rawTargetHost;
+        int destPort = SocketStack.remapPort(cfg, targetPort, false);
+        destPort = SocketStack.hopPort(cfg, destPort);
+        if (!SocketStack.isPortAllowed(cfg, destPort, false)) {
+            throw new SecurityException("Port policy blocked " + targetHost + ":" + destPort);
+        }
+        SocketStack.knock(vpn, cfg);
+        targetPort = destPort;
 
         // Route .i2p / .b32.i2p eepsites through Purple I2P SOCKS proxy when enabled
         if (cfg != null && (cfg.i2pEnabled || (targetHost != null && targetHost.toLowerCase(Locale.US).endsWith(".i2p")))) {
@@ -70,7 +80,7 @@ public final class TunnelEngine {
             Socket directRegional = new Socket();
             if (vpn != null && !cfg.loopbackExperimental) vpn.protect(directRegional);
             DnsUpstreamResolver.applyTcpSocketTuning(directRegional, cfg);
-            directRegional.connect(new InetSocketAddress(targetHost, targetPort), CONNECT_TIMEOUT_MS);
+            directRegional.connect(new InetSocketAddress(targetHost, targetPort), connectTimeout(cfg));
             return directRegional;
         }
 
@@ -140,7 +150,7 @@ public final class TunnelEngine {
                 vpn.protect(sock);
             }
             DnsUpstreamResolver.applyTcpSocketTuning(sock, cfg);
-            sock.connect(new InetSocketAddress(targetHost, targetPort), CONNECT_TIMEOUT_MS);
+            sock.connect(new InetSocketAddress(targetHost, targetPort), connectTimeout(cfg));
             return sock;
         } catch (Exception directErr) {
             if (cfg != null && "Hybrid".equalsIgnoreCase(cfg.dpiTechnique) && !cfg.socks5.isEmpty()) {
@@ -234,7 +244,7 @@ public final class TunnelEngine {
             vpn.protect(s);
         }
         DnsUpstreamResolver.applyTcpSocketTuning(s, cfg);
-        s.connect(new InetSocketAddress(socksHost, socksPort), CONNECT_TIMEOUT_MS);
+        s.connect(new InetSocketAddress(socksHost, socksPort), connectTimeout(cfg));
         OutputStream out = s.getOutputStream();
         InputStream in = s.getInputStream();
 
@@ -287,7 +297,7 @@ public final class TunnelEngine {
                 s.setReceiveBufferSize(cfg.sshRecvBufferBytes);
             } catch (Exception ignored) {}
         }
-        s.connect(new InetSocketAddress(proxyHost, proxyPort), CONNECT_TIMEOUT_MS);
+        s.connect(new InetSocketAddress(proxyHost, proxyPort), connectTimeout(cfg));
 
         String payload = formatHttpPayload(cfg, dstHost, dstPort);
         OutputStream out = s.getOutputStream();
@@ -306,7 +316,7 @@ public final class TunnelEngine {
         Socket s = new Socket();
         if (vpn != null) vpn.protect(s);
         DnsUpstreamResolver.applyTcpSocketTuning(s, cfg);
-        s.connect(new InetSocketAddress(host, port), CONNECT_TIMEOUT_MS);
+        s.connect(new InetSocketAddress(host, port), connectTimeout(cfg));
         String obfsHost = (cfg.sni != null && !cfg.sni.isEmpty()) ? cfg.sni : dstHost;
         String obfsHeader = "GET / HTTP/1.1\r\n" +
                 "Host: " + obfsHost + "\r\n" +
@@ -324,7 +334,7 @@ public final class TunnelEngine {
         Socket raw = new Socket();
         if (vpn != null) vpn.protect(raw);
         DnsUpstreamResolver.applyTcpSocketTuning(raw, cfg);
-        raw.connect(new InetSocketAddress(host, port), CONNECT_TIMEOUT_MS);
+        raw.connect(new InetSocketAddress(host, port), connectTimeout(cfg));
 
         String serverName = (sni != null && !sni.trim().isEmpty()) ? sni.trim() : host;
         SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
