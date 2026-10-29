@@ -167,6 +167,7 @@ public final class SkidVpnService extends VpnService {
         try {
             applyUnderlyingNetworkPolicy(activeConfig);
             localProxy.start(activeConfig);
+            com.skidwaredns.app.proxy.OpenPortEngine.get().restore(activeConfig);
 
             if ("Proxy-Only".equalsIgnoreCase(activeConfig.mode)) {
                 engineActive.set(true);

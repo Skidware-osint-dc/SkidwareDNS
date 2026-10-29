@@ -1,3 +1,11 @@
+# SkidwareDNS v5.5 ("Open Port") — `5.5.0-skid` (`versionCode 550`)
+
+**Open Port** binds TCP/UDP **1–10000** on this device's LAN IP, with a catalog of what each port is for (543 named IANA services; every other port still has an honest unassigned / well-known note). Not a proxy: accepted clients get a banner, then the socket closes.
+
+Configure → **Open Port**, or Ports → **Open Port on this device**. Bind **Device-IP** / `0.0.0.0` / loopback. Opened ports persist in `.skid` as `OPEN LISTEN PORTS []` and restore when the VPN engine starts.
+
+---
+
 # SkidwareDNS v5.4 ("Socket Stack") — `5.4.0-skid` (`versionCode 540`)
 
 **SkidwareDNS v5.4** is an Android VPN, 5-hop Sphinx mixnet tuner, encrypted DNS router, multi-hop tunnel forge, anti-censorship packet shaper, and universal firewall (`com.skidwaredns.app`) powered by the human-readable **`.skid` Custom Config** format.
@@ -214,7 +222,7 @@ The tool count grew to 25 screens across five vendors; v5.2 reorganises them ins
 
 ```bash
 ./build_apk.sh
-# Outputs v5.4 (540 / 5.4.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
+# Outputs v5.5 (550 / 5.5.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
 
 # Host-JVM verification + .skid preset export (81 checks)
 java -cp <classes> VerifySkidV51 /home/user/SkidwareDNS/configs

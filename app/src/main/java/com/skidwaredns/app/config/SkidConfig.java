@@ -261,6 +261,12 @@ public final class SkidConfig {
     public int httpsListenPort = 10443;
     public boolean allowWellKnownPorts = true;
 
+    // v5.5 Open Port menu (1–10000 on device IP)
+    public final List<String> openListenPorts = new ArrayList<>();
+    public String openPortBindMode = "Device-IP";
+    public boolean openPortBanner = true;
+    public boolean openPortHold = false;
+
     // === Section 3C: Anti-Censorship DPI + LBox TLS Fragmentation & SNI Shaping ===
     public String dpiStrategy = "Always";   // None, Auto, Always
     public String dpiTechnique = "Auto";    // None, Auto, TCP, TCP/TLS, Desync, Hybrid

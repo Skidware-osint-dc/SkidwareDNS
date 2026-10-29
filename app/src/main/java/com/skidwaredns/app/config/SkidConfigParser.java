@@ -207,6 +207,7 @@ public final class SkidConfigParser {
             case "ipblacklist": cfg.ipBlacklist.addAll(items); break;
             case "ignoredqtypes": cfg.ignoredQtypes.addAll(items); break;
             case "subscriptionurls": cfg.subscriptionUrls.addAll(items); break;
+            case "openlistenports": cfg.openListenPorts.addAll(items); break;
             default:
                 warnings.add("Line " + lineNo + ": unknown array '" + rawKey + "'");
                 break;
@@ -423,6 +424,9 @@ public final class SkidConfigParser {
             case "remapdns53todoh": cfg.remapDns53toDoH = parseBool(val, false); break;
             case "httpslistenport": cfg.httpsListenPort = Math.max(0, Math.min(65535, parseInt(val, 10443))); break;
             case "allowwellknownports": cfg.allowWellKnownPorts = parseBool(val, true); break;
+            case "openportbindmode": cfg.openPortBindMode = val; break;
+            case "openportbanner": cfg.openPortBanner = parseBool(val, true); break;
+            case "openporthold": cfg.openPortHold = parseBool(val, false); break;
 
             // Anti-Censorship DPI + TLS Fragmentation + SNI Shaping
             case "dpistrategy": cfg.dpiStrategy = val; break;
@@ -588,6 +592,7 @@ public final class SkidConfigParser {
         appendBracket(sb, "VPN PORTS", c.vpnPorts);
         appendBracket(sb, "PROXY PORTS", c.proxyPorts);
         appendBracket(sb, "DNS PORTS", c.dnsPorts);
+        appendBracket(sb, "OPEN LISTEN PORTS", c.openListenPorts);
         appendBracket(sb, "Custom DNS Server", c.customDnsServer);
         appendBracket(sb, "Custom VPN Server", c.customVpnServer);
         appendBracket(sb, "Custom Proxy Server", c.customProxyServer);
@@ -785,6 +790,9 @@ public final class SkidConfigParser {
         sb.append("Remap-DNS53-to-DoH=").append(c.remapDns53toDoH).append('\n');
         sb.append("HTTPS-Listen-Port=").append(c.httpsListenPort).append('\n');
         sb.append("Allow-WellKnown-Ports=").append(c.allowWellKnownPorts).append('\n');
+        sb.append("Open-Port-Bind-Mode=").append(nullSafe(c.openPortBindMode)).append('\n');
+        sb.append("Open-Port-Banner=").append(c.openPortBanner).append('\n');
+        sb.append("Open-Port-Hold=").append(c.openPortHold).append('\n');
         sb.append("DPI-Strategy=").append(nullSafe(c.dpiStrategy)).append('\n');
         sb.append("DPI-Technique=").append(nullSafe(c.dpiTechnique)).append('\n');
         sb.append("TLS-Record-Split-Bytes=").append(c.tlsRecordSplitBytes).append('\n');

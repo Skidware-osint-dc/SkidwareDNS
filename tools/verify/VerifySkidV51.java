@@ -1,6 +1,7 @@
 import com.skidwaredns.app.config.SkidConfig;
 import com.skidwaredns.app.config.SkidConfigParser;
 import com.skidwaredns.app.config.SkidConfigStore;
+import com.skidwaredns.app.proxy.PortCatalog;
 import com.skidwaredns.app.tunnel.MullvadRelayDirectory;
 
 import java.io.File;
@@ -161,6 +162,30 @@ public final class VerifySkidV51 {
         String oldSer = SkidConfigParser.serialize(oldRt.config);
         check(oldSer.contains("TCP-NoDelay=false") && oldSer.contains("HTTPS-MinTLS="),
                 "legacy serialize keeps old keys and adds v5.4 keys");
+
+        System.out.println("== 5. v5.5 Open Port catalog 1–10000 ==");
+        PortCatalog.Info http = PortCatalog.lookup(80);
+        check("HTTP".equals(http.name) && http.assigned, "port 80 is HTTP");
+        check(PortCatalog.lookup(22).name.contains("SSH"), "port 22 is SSH");
+        check(PortCatalog.lookup(443).name.contains("HTTPS"), "port 443 is HTTPS");
+        check(PortCatalog.lookup(53).name.contains("DNS"), "port 53 is DNS");
+        check(PortCatalog.page(1, 50).size() == 50, "page size 50");
+        check(PortCatalog.page(9951, 50).size() == 50, "last page 9951–10000");
+        check(PortCatalog.search("ssh", 10).size() > 0, "search ssh");
+        check(PortCatalog.search("8080", 5).get(0).port == 8080, "search 8080");
+        check(!PortCatalog.lookup(4242).about.isEmpty(), "unassigned 4242 still has a description");
+        check(PortCatalog.lookup(0).name.contains("Out of range"), "port 0 out of range");
+        check(PortCatalog.lookup(10001).name.contains("Out of range"), "port 10001 out of range");
+        SkidConfig op = new SkidConfig();
+        op.openListenPorts.add("8080/tcp");
+        op.openPortBindMode = "0.0.0.0";
+        op.openPortHold = true;
+        String opSer = SkidConfigParser.serialize(op);
+        SkidConfig op2 = SkidConfigParser.parse(opSer).config;
+        check(op2.openListenPorts.contains("8080/tcp"), "OPEN LISTEN PORTS round-trip");
+        check("0.0.0.0".equals(op2.openPortBindMode), "Open-Port-Bind-Mode round-trip");
+        check(op2.openPortHold, "Open-Port-Hold round-trip");
+        check(op2.openPortBanner, "Open-Port-Banner default true");
 
         System.out.println();
         System.out.println(failures == 0 ? "PASS: VerifySkidV51 (" + checks + " checks)"

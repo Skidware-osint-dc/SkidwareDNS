@@ -10,8 +10,8 @@ android {
         applicationId "com.skidwaredns.app"
         minSdk 24
         targetSdk 34
-        versionCode 540
-        versionName "5.4.0-skid"
+        versionCode 550
+        versionName "5.5.0-skid"
     }
 
     buildTypes {

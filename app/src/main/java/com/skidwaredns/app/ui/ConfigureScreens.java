@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.skidwaredns.app.config.SkidConfig;
 import com.skidwaredns.app.dns.DnsUpstreamResolver;
+import com.skidwaredns.app.proxy.OpenPortEngine;
 import com.skidwaredns.app.firewall.SkidFirewallEngine;
 import com.skidwaredns.app.model.DnsPresets;
 import com.skidwaredns.app.tunnel.TunnelEngine;
@@ -51,6 +52,7 @@ public final class ConfigureScreens {
     public static final int SUB_LOGS_SETTINGS = 9;
     public static final int SUB_HTTPS = 25;
     public static final int SUB_PORTS = 26;
+    public static final int SUB_OPEN_PORT = OpenPortScreens.SUB_OPEN_PORT;
 
     public interface HostCallbacks {
         SkidConfig getConfig();
@@ -75,6 +77,7 @@ public final class ConfigureScreens {
             case SUB_TCPIP_UDP: return buildTcpIpUdpScreen(ctx, host);
             case SUB_HTTPS: return buildHttpsScreen(ctx, host);
             case SUB_PORTS: return buildPortsScreen(ctx, host);
+            case OpenPortScreens.SUB_OPEN_PORT: return OpenPortScreens.build(ctx, host);
             case SUB_ANTICENSORSHIP: return buildAntiCensorshipScreen(ctx, host);
             case SUB_NETWORK: return buildNetworkScreen(ctx, host);
             case SUB_GENERAL: return buildGeneralSettingsScreen(ctx, host);
@@ -132,7 +135,7 @@ public final class ConfigureScreens {
         headLeft.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         headLeft.addView(UiFactory.label(ctx, "Configure", 22f, UiFactory.COLOR_TEXT, true, false));
         headLeft.addView(UiFactory.label(ctx, "Every tool, one place \u2022 search or drill in", 12f, UiFactory.COLOR_MUTED, false, false));
-        TextView verChip = UiFactory.counterChip(ctx, "v5.4", UiFactory.COLOR_SKY);
+        TextView verChip = UiFactory.counterChip(ctx, "v5.5", UiFactory.COLOR_SKY);
         LinearLayout headRight = new LinearLayout(ctx);
         headRight.setOrientation(LinearLayout.HORIZONTAL);
         headRight.setGravity(Gravity.CENTER_VERTICAL);
@@ -322,6 +325,10 @@ public final class ConfigureScreens {
         perf.add(new UiFactory.SettingEntry("#", "Ports",
                 "block " + cfg.portBlockList + " \u2022 SOCKS :" + cfg.getPrimaryLocalSocksPort(),
                 UiFactory.COLOR_AMBER, 0, navTo(host, SUB_PORTS)));
+        perf.add(new UiFactory.SettingEntry("PORT", "Open Port",
+                OpenPortEngine.get().list().size() + " listening \u2022 catalog 1–10000 \u2022 "
+                        + OpenPortEngine.primaryDeviceIpv4(),
+                UiFactory.COLOR_AMBER, 0, navTo(host, OpenPortScreens.SUB_OPEN_PORT)));
         addSection(ctx, host, holder, "\u26A1", "Performance & Sockets",
                 "Buffers, TLS, NAT, MSS and port policy", UiFactory.COLOR_AMBER, perf, query, false);
 
@@ -2477,6 +2484,13 @@ public final class ConfigureScreens {
 
         col.addView(UiFactory.backHeader(ctx, "Ports",
                 "Allow / block lists, forwarding, knock, hop, bind policy", backToHub(host)));
+
+        col.addView(UiFactory.categoryTitle(ctx, "Open a port"));
+        LinearLayout openCard = UiFactory.card(ctx, UiFactory.COLOR_SKY);
+        openCard.addView(UiFactory.iconNavRow(ctx, "PORT", "Open Port on this device",
+                OpenPortEngine.describeBind(cfg) + " \u2022 catalog of ports 1–10000",
+                UiFactory.COLOR_SKY, navTo(host, OpenPortScreens.SUB_OPEN_PORT)));
+        col.addView(openCard);
 
         col.addView(UiFactory.categoryTitle(ctx, "Listen ports"));
         LinearLayout listen = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
