@@ -1,8 +1,10 @@
-# SkidwareDNS v5.2 ("Clean Configure Edition") — `5.2.0-skid` (`versionCode 520`)
+# SkidwareDNS v5.3 ("Hex Mark + Relays") — `5.3.0-skid` (`versionCode 530`)
 
-**SkidwareDNS v5.2** is an Android VPN, 5-hop Sphinx mixnet tuner, encrypted DNS router, multi-hop tunnel forge, anti-censorship packet shaper, and universal firewall (`com.skidwaredns.app`) powered by the human-readable **`.skid` Custom Config** format.
+**SkidwareDNS v5.3** is an Android VPN, 5-hop Sphinx mixnet tuner, encrypted DNS router, multi-hop tunnel forge, anti-censorship packet shaper, and universal firewall (`com.skidwaredns.app`) powered by the human-readable **`.skid` Custom Config** format.
 
-Version **5.2** is the **UI cleanup release**: the home screen drops from five stacked product cards to one **ACTIVE ROUTE** summary plus a flat **2x3 TOOLS** launcher, and Configure becomes a **searchable, collapsible, task-grouped directory** (27 destinations in six groups) instead of a 17-card wall.
+Version **5.3** ships the official **hexagon-U launcher icon**, vector icons on every button / nav / tile / switch-row, **sky-blue switch tints**, and **14 new Mullvad relays** (Sofia DAITA, Nicosia, Copenhagen 100G, Helsinki 40G, London 100G, Tel Aviv) — all byte-checked against `https://api.mullvad.net/www/relays/all/`.
+
+Version **5.2** was the **UI cleanup release**: the home screen drops from five stacked product cards to one **ACTIVE ROUTE** summary plus a flat **2x3 TOOLS** launcher, and Configure becomes a **searchable, collapsible, task-grouped directory** (27 destinations in six groups) instead of a 17-card wall.
 
 Version **5.1** added the complete **Mullvad Relay** suite — a cryptographically verified relay directory (checked byte-for-byte against `https://api.mullvad.net/www/relays/all/`), **100 Gbps Tallinn `xtom` DAITA** relays, **Zurich `31173` / `PrivateLayer`** WireGuard relays, **AWS-style true WireGuard multihop** (`EntryIPv4:ExitMultihopPort`), **DAITA (Defense Against AI-guided Traffic Analysis)** Maybenot uniform-packet padding, Mullvad **SOCKS5 `:1080`** exit chaining, and the Zurich **`ch-zrh-br-001` SSH/V2Ray bridge** with pinned `SHA256`/`MD5` fingerprints — unified with **NymVPN**, **Evozi HTTP Injector**, **RethinkDNS**, **LBox**, **InviZible Pro** (`DNSCrypt + Tor + Purple I2P`), **AndroidMegaProxy**, and **SniShaper Lumine**.
 
@@ -29,6 +31,33 @@ Version **5.1** added the complete **Mullvad Relay** suite — a cryptographical
 
 ---
 
+
+## What's New in v5.3 (Icon, Switches, 14 more Mullvad relays)
+
+### 1. Official hexagon-U launcher icon
+The SkidwareDNS mark (pointy-top hexagon + block U) is now the adaptive launcher icon, the Quick Settings tile, and the in-app `SKID` nav glyph. Legacy mipmaps at mdpi→xxxhdpi are generated from the same art.
+
+### 2. Vector icons on every control
+`SkidIcons` draws 70 programmatic 24×24 icons (no emoji fonts, no icon packs). They land on:
+- Bottom nav (Home / Stats / SKID / Configure / Logs)
+- Home START / STOP / PAUSE / mode chevron
+- 2×3 TOOLS tiles (Relays, Mixnet, Injector, DNSCrypt, Tor, I2P)
+- Every `actionButton` (compound drawable inferred from the label)
+- Every switch-row, nav-row, slider-row, task tile, collapsible section, hub card, back chevron
+
+### 3. Switch colors
+DeviceDefault green/magenta thumbs are gone. Checked track is sky `#5CC8FF`, thumb is near-white; unchecked track is graphite `#3A414D`. Theme also sets `colorControlActivated` to cyan.
+
+### 4. 14 new Mullvad relays (23 pinned total)
+All field-for-field against the live API + the screenshots:
+- **Sofia, Bulgaria** `bg-sof-wg-001..003` — M247 / 20 Gbps, Rented, **DAITA: Yes** (multihop `3225` / `3226` / `3100`)
+- **Nicosia, Cyprus** `cy-nic-wg-001..002` — HostRoyale / 10 Gbps, Rented (`3337` / `3338`)
+- **Copenhagen, Denmark** `dk-cph-wg-102` — DataPacket / **100 Gbps**, Owned (`3599`)
+- **Helsinki, Finland** `fi-hel-wg-201..202` — 31173 / 40 Gbps, Owned (`3155` / `3194`)
+- **London, UK** `gb-lon-wg-101..103` — xtom / **100 Gbps**, Owned (`3440` / `3441` / `3442`)
+- **Tel Aviv, Israel** `il-tlv-wg-101..103` — DataPacket / 10 Gbps, Rented (`3513` / `3533` / `3534`)
+
+New presets: `mullvad_sofia_daita.skid`, `mullvad_london_100g.skid`, `mullvad_copenhagen_to_sofia_multihop.skid` (23 total).
 
 ## What's New in v5.2 (UI Cleanup & Information Architecture)
 
@@ -152,6 +181,9 @@ The tool count grew to 25 screens across five vendors; v5.2 reorganises them ins
 18. `mullvad_tallinn_100g_daita.skid` — **v5.1** Mullvad `ee-tll-wg-101` Tallinn `xtom / 100 Gbps` (`Owned by Mullvad`, `DAITA: Yes`) + SOCKS5 `:1080` + Mullvad DoH
 19. `mullvad_zurich_to_tallinn_multihop.skid` — **v5.1** True WireGuard multihop `ch-zrh-wg-001` (`193.32.127.71`) → `ee-tll-wg-102` on multihop port `3514` (100 Gbps DAITA exit)
 20. `mullvad_zurich_bridge_ssh_v2ray.skid` — **v5.1** `ch-zrh-br-001` SSH bridge (`193.32.127.117`, pinned `SHA256` fingerprint) / V2Ray (`193.32.127.118`) → `ch-zrh-wg-003`
+21. `mullvad_sofia_daita.skid` — **v5.3** Mullvad `bg-sof-wg-001` Sofia `M247 / 20 Gbps` (`Rented`, `DAITA: Yes`) + SOCKS5 `:1080`
+22. `mullvad_london_100g.skid` — **v5.3** Mullvad `gb-lon-wg-101` London `xtom / 100 Gbps` (`Owned by Mullvad`)
+23. `mullvad_copenhagen_to_sofia_multihop.skid` — **v5.3** True WireGuard multihop `dk-cph-wg-102` (`149.88.109.73`) → `bg-sof-wg-003` on multihop port `3100` (Sofia DAITA exit)
 
 ---
 
@@ -159,7 +191,7 @@ The tool count grew to 25 screens across five vendors; v5.2 reorganises them ins
 
 ```bash
 ./build_apk.sh
-# Outputs v5.2 (520 / 5.2.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
+# Outputs v5.3 (530 / 5.3.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
 
 # Host-JVM verification + .skid preset export (81 checks)
 java -cp <classes> VerifySkidV51 /home/user/SkidwareDNS/configs

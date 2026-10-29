@@ -18,8 +18,8 @@ import java.util.Locale;
 
 /**
  * SkidwareDNS v5.1 Mullvad Relay Directory, True WireGuard Multihop, DAITA & SSH/V2Ray Bridge Engine:
- *  - Pre-bundled with all 9 verified Tallinn (Estonia 100 Gbps DAITA) & Zurich (Switzerland WG + Bridge) relays
- *    from Screenshots 215141–215713, cryptographically cross-checked against https://api.mullvad.net/www/relays/all/
+ *  - Pre-bundled with 23 verified relays: Tallinn, Zurich (+ Bridge), Sofia DAITA, Nicosia, Copenhagen 100G,
+ *    Helsinki 40G, London 100G, Tel Aviv — cryptographically cross-checked against https://api.mullvad.net/www/relays/all/
  *  - Live Mullvad Relay API Synchronizer (pure-Java JSON parser — zero Stub! or external library dependencies)
  *  - True Mullvad WireGuard Multihop calculator (Endpoint = EntryIPv4:ExitMultihopPort, Peer PublicKey = ExitPubKey)
  *  - DAITA (Defense Against AI-guided Traffic Analysis — Maybenot constant-size 1420B padding & decoy bursts)
@@ -185,6 +185,144 @@ public final class MullvadRelayDirectory {
                 "193.32.127.118"
         ));
 
+        // 10–12: Sofia, Bulgaria (M247 / 20 Gbps • Rented • DAITA: Yes)
+        list.add(new MullvadRelay(
+                "bg-sof-wg-001", "Sofia", "Bulgaria", "bg", "🇧🇬",
+                "M247", 20, false, "wireguard",
+                "bg-sof-wg-001.relays.mullvad.net",
+                "146.70.188.130", "2001:ac8:30:55::f001", true,
+                "J8KysHmHZWqtrVKKOppneDXSks/PDsB1XTlRHpwiABA=",
+                "bg-sof-wg-socks5-001.relays.mullvad.net:1080", 3225,
+                "", "", ""
+        ));
+        list.add(new MullvadRelay(
+                "bg-sof-wg-002", "Sofia", "Bulgaria", "bg", "🇧🇬",
+                "M247", 20, false, "wireguard",
+                "bg-sof-wg-002.relays.mullvad.net",
+                "135.136.38.2", "2001:ac8:30:56::f001", true,
+                "dg+Fw7GnKvDPBxFpnj1KPoNIu1GakuVoDJjKRni+pRU=",
+                "bg-sof-wg-socks5-002.relays.mullvad.net:1080", 3226,
+                "", "", ""
+        ));
+        list.add(new MullvadRelay(
+                "bg-sof-wg-003", "Sofia", "Bulgaria", "bg", "🇧🇬",
+                "M247", 20, false, "wireguard",
+                "bg-sof-wg-003.relays.mullvad.net",
+                "146.70.188.2", "2001:ac8:30:54::f001", true,
+                "ug2e9Pdp5imXjuefrKqmYYzfMnC83whlLBj7eFi81UI=",
+                "bg-sof-wg-socks5-003.relays.mullvad.net:1080", 3100,
+                "", "", ""
+        ));
+
+        // 13–14: Nicosia, Cyprus (HostRoyale / 10 Gbps • Rented)
+        list.add(new MullvadRelay(
+                "cy-nic-wg-001", "Nicosia", "Cyprus", "cy", "🇨🇾",
+                "HostRoyale", 10, false, "wireguard",
+                "cy-nic-wg-001.relays.mullvad.net",
+                "195.47.194.131", "2a06:3040:f:601::f001", false,
+                "Ae9YcQjcQT+W8MU0EhKXx6KPWo6ticS1NI91e+Zy5GA=",
+                "cy-nic-wg-socks5-001.relays.mullvad.net:1080", 3337,
+                "", "", ""
+        ));
+        list.add(new MullvadRelay(
+                "cy-nic-wg-002", "Nicosia", "Cyprus", "cy", "🇨🇾",
+                "HostRoyale", 10, false, "wireguard",
+                "cy-nic-wg-002.relays.mullvad.net",
+                "195.47.194.161", "2a06:3040:f:601::f101", false,
+                "LOd1SY9YCHGiJUVT+XdYRdORu6ZMw4CqOKQBW2ElLg8=",
+                "cy-nic-wg-socks5-002.relays.mullvad.net:1080", 3338,
+                "", "", ""
+        ));
+
+        // 15: Copenhagen, Denmark (DataPacket / 100 Gbps • Owned by Mullvad)
+        list.add(new MullvadRelay(
+                "dk-cph-wg-102", "Copenhagen", "Denmark", "dk", "🇩🇰",
+                "DataPacket", 100, true, "wireguard",
+                "dk-cph-wg-102.relays.mullvad.net",
+                "149.88.109.73", "2a02:6ea0:470b:0:2::f001", false,
+                "oFSh/6OxGDc8LY+kCj9SNebPphDGM9UIeln0cseILxs=",
+                "dk-cph-wg-socks5-102.relays.mullvad.net:1080", 3599,
+                "", "", ""
+        ));
+
+        // 16–17: Helsinki, Finland (31173 / 40 Gbps • Owned by Mullvad)
+        list.add(new MullvadRelay(
+                "fi-hel-wg-201", "Helsinki", "Finland", "fi", "🇫🇮",
+                "31173", 40, true, "wireguard",
+                "fi-hel-wg-201.relays.mullvad.net",
+                "185.65.133.5", "2a03:1b20:d:f011:1::f001", false,
+                "u+Ir9bnz8PtwXoJGQXvCxz6a+1NChEbBIox8KdWarxk=",
+                "fi-hel-wg-socks5-201.relays.mullvad.net:1080", 3155,
+                "", "", ""
+        ));
+        list.add(new MullvadRelay(
+                "fi-hel-wg-202", "Helsinki", "Finland", "fi", "🇫🇮",
+                "31173", 40, true, "wireguard",
+                "fi-hel-wg-202.relays.mullvad.net",
+                "185.65.133.85", "2a03:1b20:d:f011:2::f001", false,
+                "hAbVKL5Q0285gJ28nMSfztw7/FXJb+cxiKD2NMgPpTM=",
+                "fi-hel-wg-socks5-202.relays.mullvad.net:1080", 3194,
+                "", "", ""
+        ));
+
+        // 18–20: London, UK (xtom / 100 Gbps • Owned by Mullvad)
+        list.add(new MullvadRelay(
+                "gb-lon-wg-101", "London", "UK", "gb", "🇬🇧",
+                "xtom", 100, true, "wireguard",
+                "gb-lon-wg-101.relays.mullvad.net",
+                "45.66.219.3", "2a07:d883:701:1::f001", false,
+                "c63L5Zl92C7K0j3rsHDeEu6ZzEaG9PkA4sZeFRPhgHo=",
+                "gb-lon-wg-socks5-101.relays.mullvad.net:1080", 3440,
+                "", "", ""
+        ));
+        list.add(new MullvadRelay(
+                "gb-lon-wg-102", "London", "UK", "gb", "🇬🇧",
+                "xtom", 100, true, "wireguard",
+                "gb-lon-wg-102.relays.mullvad.net",
+                "45.66.219.166", "2a07:d883:701:2::f001", false,
+                "KT35IIlJExy9SSR1PqjnjE9wZ7HP2y52J5wjjRBUSjo=",
+                "gb-lon-wg-socks5-102.relays.mullvad.net:1080", 3441,
+                "", "", ""
+        ));
+        list.add(new MullvadRelay(
+                "gb-lon-wg-103", "London", "UK", "gb", "🇬🇧",
+                "xtom", 100, true, "wireguard",
+                "gb-lon-wg-103.relays.mullvad.net",
+                "45.66.219.209", "2a07:d883:701:3::f001", false,
+                "FmapWWiwyLpMsKf9jG3pgTSM3GD609nQowqEWFtZoAc=",
+                "gb-lon-wg-socks5-103.relays.mullvad.net:1080", 3442,
+                "", "", ""
+        ));
+
+        // 21–23: Tel Aviv, Israel (DataPacket / 10 Gbps • Rented)
+        list.add(new MullvadRelay(
+                "il-tlv-wg-101", "Tel Aviv", "Israel", "il", "🇮🇱",
+                "DataPacket", 10, false, "wireguard",
+                "il-tlv-wg-101.relays.mullvad.net",
+                "169.150.227.197", "2a02:6ea0:3b00:1::a01f", false,
+                "XOedjVJaT2IrEDJbzvtZeL4hP5uPRHzFxvD1cwVwUFo=",
+                "il-tlv-wg-socks5-101.relays.mullvad.net:1080", 3513,
+                "", "", ""
+        ));
+        list.add(new MullvadRelay(
+                "il-tlv-wg-102", "Tel Aviv", "Israel", "il", "🇮🇱",
+                "DataPacket", 10, false, "wireguard",
+                "il-tlv-wg-102.relays.mullvad.net",
+                "169.150.227.210", "2a02:6ea0:3b00:2::a02f", false,
+                "UNeML4rXjvOerAstTNf4gG5B+OfjVzjSQrWE6mrswD0=",
+                "il-tlv-wg-socks5-102.relays.mullvad.net:1080", 3533,
+                "", "", ""
+        ));
+        list.add(new MullvadRelay(
+                "il-tlv-wg-103", "Tel Aviv", "Israel", "il", "🇮🇱",
+                "DataPacket", 10, false, "wireguard",
+                "il-tlv-wg-103.relays.mullvad.net",
+                "169.150.227.222", "2a02:6ea0:3b00:3::a03f", false,
+                "11FJ/NY3jaAw1PSYG9w7bxsMxAzlI+1p8/juh1LJPT0=",
+                "il-tlv-wg-socks5-103.relays.mullvad.net:1080", 3534,
+                "", "", ""
+        ));
+
         BUILTIN_RELAYS = Collections.unmodifiableList(list);
     }
 
@@ -296,7 +434,7 @@ public final class MullvadRelayDirectory {
             conn.setConnectTimeout(7000);
             conn.setReadTimeout(10000);
             conn.setRequestProperty("Accept", "application/json");
-            conn.setRequestProperty("User-Agent", "SkidwareDNS/5.1");
+            conn.setRequestProperty("User-Agent", "SkidwareDNS/5.3");
             int code = conn.getResponseCode();
             if (code != 200) throw new IllegalStateException("HTTP " + code);
 
@@ -309,7 +447,7 @@ public final class MullvadRelayDirectory {
             String json = new String(baos.toByteArray(), StandardCharsets.UTF_8);
             List<MullvadRelay> parsed = parseMullvadRelayArray(json, 120);
             if (!parsed.isEmpty()) {
-                // Keep our 9 pinned Estonia + Switzerland relays at the top, followed by live relays
+                // Keep our 23 pinned relays at the top, followed by live relays
                 List<MullvadRelay> merged = new ArrayList<>(BUILTIN_RELAYS);
                 for (MullvadRelay r : parsed) {
                     boolean dup = false;

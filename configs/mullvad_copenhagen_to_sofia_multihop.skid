@@ -1,0 +1,43 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v5.3
+# Preset: Mullvad True WireGuard Multihop (Copenhagen 100G Entry -> Sofia DAITA Exit :3100)
+
+===========
+DNS Servers [https://dns.mullvad.net/dns-query, 100.64.0.1:53]
+VPN Servers [149.88.109.73:3100, bg-sof-wg-003.relays.mullvad.net:51820]
+Addresses [10.64.0.2/32, fc00:bbbb:bbbb:bb01::2/128]
+SOCKS5 [bg-sof-wg-socks5-003.relays.mullvad.net:1080, 127.0.0.1:10808]
+VPN PORTS [3100, 51820]
+PROXY PORTS [1080, 10808, 10809]
+DNS PORTS [443, 53]
+Custom DNS Server []
+Custom VPN Server [149.88.109.73:3100]
+Custom Proxy Server [bg-sof-wg-socks5-003.relays.mullvad.net:1080]
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Mullvad-Multihop-CPH-to-SOF
+Proxy mode=SOCKS5
+DNS Mode=Injector-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Quad9
+Tunnel=WireGuard
+Connect-from-mode=Direct
+===========
+WG-Profile-Name=mullvad-dk-cph-wg-102-to-bg-sof-wg-003
+WG-Enabled=true
+WG-Endpoint=149.88.109.73:3100
+WG-Public-Key=ug2e9Pdp5imXjuefrKqmYYzfMnC83whlLBj7eFi81UI=
+Injector-DoH-Provider=Mullvad
+Mullvad-Enabled=true
+Mullvad-Multihop=true
+Mullvad-Entry-Relay=dk-cph-wg-102
+Mullvad-Exit-Relay=bg-sof-wg-003
+Mullvad-DAITA=true
+Mullvad-Use-Socks5=true
+Mullvad-Owned-Only=false
+===========

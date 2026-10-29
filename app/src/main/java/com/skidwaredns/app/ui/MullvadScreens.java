@@ -79,7 +79,7 @@ public final class MullvadScreens {
                 }));
 
         ctrlCard.addView(UiFactory.iconSwitchRow(ctx, "🛡", "DAITA (Defense Against AI Traffic Analysis)",
-                "Maybenot uniform 1280B packet padding & anti-fingerprinting bursts (supported on Tallinn 100G relays)",
+                "Maybenot uniform 1280B packet padding & anti-fingerprinting bursts (Tallinn 100G + Sofia 20G DAITA)",
                 cfg.mullvadDaita, new UiFactory.ToggleListener() {
                     @Override public void onToggled(boolean c) {
                         cfg.mullvadDaita = c;
@@ -113,7 +113,7 @@ public final class MullvadScreens {
         ctrlCard.addView(topBtns);
 
         final TextView syncStatusTv = UiFactory.label(ctx,
-                "Loaded " + MullvadRelayDirectory.getAllRelays().size() + " verified relays (Tallinn 100G DAITA + Zurich WG/Bridge).",
+                "Loaded " + MullvadRelayDirectory.getAllRelays().size() + " verified relays (23 pinned: Sofia DAITA, London 100G, CPH, HEL, TLV, NIC + Tallinn/Zurich).",
                 11.5f, UiFactory.COLOR_MUTED, false, true);
         ctrlCard.addView(syncStatusTv);
         col.addView(ctrlCard);
@@ -206,7 +206,7 @@ public final class MullvadScreens {
 
             col.addView(buildSingleRelayCard(ctx, host, cfg, r));
             shown++;
-            if (shown >= 35) break; // Keep scroll smooth when 100+ live relays are synced
+            if (shown >= 48) break; // Keep scroll smooth when 100+ live relays are synced
         }
 
         sv.addView(col);
@@ -237,12 +237,14 @@ public final class MullvadScreens {
         hdr.setPadding(hp, hp, hp, hp);
         hdr.setBackground(UiFactory.roundedRect(ctx, COLOR_MULLVAD_HEADER, Color.TRANSPARENT, 0f, 13f));
 
-        TextView plugDot = UiFactory.label(ctx, "🔌", 14f, Color.WHITE, true, false);
-        plugDot.setGravity(Gravity.CENTER);
+        android.widget.ImageView plugDot = UiFactory.iconView(ctx, SkidIcons.PLUG, Color.WHITE, 16f);
         int dotSz = UiFactory.dp(ctx, 32);
         LinearLayout.LayoutParams dLp = new LinearLayout.LayoutParams(dotSz, dotSz);
         dLp.rightMargin = UiFactory.dp(ctx, 12);
         plugDot.setLayoutParams(dLp);
+        int pp = UiFactory.dp(ctx, 8);
+        plugDot.setPadding(pp, pp, pp, pp);
+        plugDot.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
         plugDot.setBackground(UiFactory.roundedRect(ctx, COLOR_MULLVAD_GREEN, Color.TRANSPARENT, 0f, 16f));
 
         LinearLayout metaCol = new LinearLayout(ctx);

@@ -128,7 +128,7 @@ public final class ConfigureScreens {
         headLeft.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         headLeft.addView(UiFactory.label(ctx, "Configure", 22f, UiFactory.COLOR_TEXT, true, false));
         headLeft.addView(UiFactory.label(ctx, "Every tool, one place \u2022 search or drill in", 12f, UiFactory.COLOR_MUTED, false, false));
-        TextView verChip = UiFactory.counterChip(ctx, "v5.2", UiFactory.COLOR_SKY);
+        TextView verChip = UiFactory.counterChip(ctx, "v5.3", UiFactory.COLOR_SKY);
         LinearLayout headRight = new LinearLayout(ctx);
         headRight.setOrientation(LinearLayout.HORIZONTAL);
         headRight.setGravity(Gravity.CENTER_VERTICAL);
@@ -185,8 +185,8 @@ public final class ConfigureScreens {
 
         renderSectionDirectory(ctx, host, cfg, sectionsHolder, "");
 
-        col.addView(UiFactory.versionFooter(ctx, "v 5 . 2",
-                "20 presets \u2022 9 Mullvad relays \u2022 " + cfg.name + ".skid"));
+        col.addView(UiFactory.versionFooter(ctx, "v 5 . 3",
+                "23 presets \u2022 23 Mullvad relays \u2022 " + cfg.name + ".skid"));
 
         sv.addView(col);
         return sv;

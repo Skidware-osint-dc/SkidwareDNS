@@ -103,6 +103,20 @@ public final class DnsUpstreamResolver {
         BOOTSTRAP_CACHE.put("ch-zrh-wg-201.relays.mullvad.net", "179.43.189.66");
         BOOTSTRAP_CACHE.put("ch-zrh-wg-202.relays.mullvad.net", "46.19.136.226");
         BOOTSTRAP_CACHE.put("ch-zrh-br-001.relays.mullvad.net", "193.32.127.117");
+        BOOTSTRAP_CACHE.put("bg-sof-wg-001.relays.mullvad.net", "146.70.188.130");
+        BOOTSTRAP_CACHE.put("bg-sof-wg-002.relays.mullvad.net", "135.136.38.2");
+        BOOTSTRAP_CACHE.put("bg-sof-wg-003.relays.mullvad.net", "146.70.188.2");
+        BOOTSTRAP_CACHE.put("cy-nic-wg-001.relays.mullvad.net", "195.47.194.131");
+        BOOTSTRAP_CACHE.put("cy-nic-wg-002.relays.mullvad.net", "195.47.194.161");
+        BOOTSTRAP_CACHE.put("dk-cph-wg-102.relays.mullvad.net", "149.88.109.73");
+        BOOTSTRAP_CACHE.put("fi-hel-wg-201.relays.mullvad.net", "185.65.133.5");
+        BOOTSTRAP_CACHE.put("fi-hel-wg-202.relays.mullvad.net", "185.65.133.85");
+        BOOTSTRAP_CACHE.put("gb-lon-wg-101.relays.mullvad.net", "45.66.219.3");
+        BOOTSTRAP_CACHE.put("gb-lon-wg-102.relays.mullvad.net", "45.66.219.166");
+        BOOTSTRAP_CACHE.put("gb-lon-wg-103.relays.mullvad.net", "45.66.219.209");
+        BOOTSTRAP_CACHE.put("il-tlv-wg-101.relays.mullvad.net", "169.150.227.197");
+        BOOTSTRAP_CACHE.put("il-tlv-wg-102.relays.mullvad.net", "169.150.227.210");
+        BOOTSTRAP_CACHE.put("il-tlv-wg-103.relays.mullvad.net", "169.150.227.222");
     }
 
     private DnsUpstreamResolver() {}

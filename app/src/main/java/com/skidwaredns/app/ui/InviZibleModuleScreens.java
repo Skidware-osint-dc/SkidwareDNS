@@ -107,6 +107,7 @@ public final class InviZibleModuleScreens {
 
             final Switch sw = new Switch(ctx);
             sw.setChecked(cfg.lboxTemplates.contains(tpl.id));
+            UiFactory.tintSwitch(sw);
             sw.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

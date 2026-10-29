@@ -10,7 +10,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.widget.ImageView;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.Build;
@@ -77,7 +79,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
     private FrameLayout contentContainer;
     private TextView firewallBubbleBanner;
     private final List<LinearLayout> navPills = new ArrayList<>();
-    private final List<TextView> navIcons = new ArrayList<>();
+    private final List<ImageView> navIcons = new ArrayList<>();
     private final List<TextView> navLabels = new ArrayList<>();
 
     // Home Bento Live Refs
@@ -91,7 +93,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
     private TextView homeProxyCardSub;
     private TextView homeFirewallRowText;
     private TextView homeTcpDpiRowText;
-    private TextView homePauseBtn;
+    private ImageView homePauseBtn;
     private TextView homeStartPillBtn;
 
     // Stats Live Refs
@@ -196,7 +198,9 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         navBar.setBackgroundColor(UiFactory.COLOR_SURFACE);
         navBar.setPadding(UiFactory.dp(this, 6), UiFactory.dp(this, 8), UiFactory.dp(this, 6), UiFactory.dp(this, 10));
 
-        String[] icons = new String[]{"⌂", "📈", "✦", "⚙", "☰"};
+        int[] navIconKinds = new int[]{
+                SkidIcons.HOME, SkidIcons.STATS, SkidIcons.SKID, SkidIcons.SLIDERS, SkidIcons.LOGS
+        };
         String[] titles = new String[]{"Home", "Stats", "SKID", "Configure", "Logs"};
 
         navPills.clear();
@@ -214,7 +218,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
             pill.setGravity(Gravity.CENTER);
             pill.setPadding(UiFactory.dp(this, 16), UiFactory.dp(this, 4), UiFactory.dp(this, 16), UiFactory.dp(this, 4));
 
-            TextView ic = UiFactory.label(this, icons[i], 15f, UiFactory.COLOR_TEXT, true, false);
+            ImageView ic = UiFactory.iconView(this, navIconKinds[i], UiFactory.COLOR_TEXT, 20f);
             pill.addView(ic);
 
             TextView lb = UiFactory.label(this, titles[i], 11.5f, UiFactory.COLOR_MUTED, true, false);
@@ -252,7 +256,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
             navPills.get(i).setBackground(sel
                     ? UiFactory.roundedRect(this, UiFactory.COLOR_ICON_BG, Color.TRANSPARENT, 0f, 16f)
                     : null);
-            navIcons.get(i).setTextColor(sel ? UiFactory.COLOR_TEXT : UiFactory.COLOR_MUTED);
+            navIcons.get(i).setColorFilter(sel ? UiFactory.COLOR_TEXT : UiFactory.COLOR_MUTED, PorterDuff.Mode.SRC_IN);
             navLabels.get(i).setTextColor(sel ? UiFactory.COLOR_TEXT : UiFactory.COLOR_MUTED);
         }
 
@@ -390,13 +394,17 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         routeCard.addView(routePills);
         col.addView(routeCard);
 
-        // Flat 2x3 tool launcher: one glyph + label per engine, no duplicate toggles.
+        // Flat 2x3 tool launcher: vector icon + label per engine, no duplicate toggles.
         col.addView(UiFactory.groupCaption(this, "TOOLS"));
-        String[][] toolLabels = new String[][]{
-                {"\uD83D\uDD0C", "Relays"}, {"\uD83D\uDC22", "Mixnet"},
-                {"\uD83D\uDC89", "Injector"}, {"\uD83D\uDD10", "DNSCrypt"},
-                {"\uD83E\uDDC5", "Tor"}, {"\uD83D\uDFE3", "I2P"}
+        final int[] toolIconKinds = new int[]{
+                SkidIcons.PLUG, SkidIcons.MIXNET, SkidIcons.INJECT,
+                SkidIcons.LOCK, SkidIcons.TOR, SkidIcons.I2P
         };
+        final int[] toolIconColors = new int[]{
+                Color.parseColor("#2ECC40"), Color.parseColor("#3BE38C"), Color.parseColor("#1D9BF0"),
+                UiFactory.COLOR_PURPLE, UiFactory.COLOR_AMBER, Color.parseColor("#C084FC")
+        };
+        String[] toolNames = new String[]{"Relays", "Mixnet", "Injector", "DNSCrypt", "Tor", "I2P"};
         final int[] toolTargets = new int[]{
                 MullvadScreens.SUB_MULLVAD_RELAYS,
                 NymVpnScreens.SUB_NYM_MIXNET_TUNING,
@@ -413,9 +421,8 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
             tile.setGravity(Gravity.CENTER);
             tile.setPadding(UiFactory.dp(this, 6), UiFactory.dp(this, 12), UiFactory.dp(this, 6), UiFactory.dp(this, 12));
             tile.setBackground(UiFactory.roundedRect(this, UiFactory.COLOR_CARD, UiFactory.COLOR_BORDER, 0.8f, 14f));
-            TextView g = UiFactory.label(this, toolLabels[ti][0], 17f, UiFactory.COLOR_TEXT, false, false);
-            g.setGravity(Gravity.CENTER);
-            TextView n = UiFactory.label(this, toolLabels[ti][1], 11.5f, UiFactory.COLOR_MUTED, true, false);
+            ImageView g = UiFactory.iconView(this, toolIconKinds[ti], toolIconColors[ti], 22f);
+            TextView n = UiFactory.label(this, toolNames[ti], 11.5f, UiFactory.COLOR_MUTED, true, false);
             n.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams nLp2 = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -617,12 +624,12 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         dock.setPadding(UiFactory.dp(this, 22), UiFactory.dp(this, 10), UiFactory.dp(this, 22), UiFactory.dp(this, 16));
 
         int circleSize = UiFactory.dp(this, 48);
-        homePauseBtn = new TextView(this);
-        homePauseBtn.setText("⏸");
-        homePauseBtn.setTextColor(UiFactory.COLOR_TEXT);
-        homePauseBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f);
-        homePauseBtn.setGravity(Gravity.CENTER);
-        homePauseBtn.setLayoutParams(new LinearLayout.LayoutParams(circleSize, circleSize));
+        homePauseBtn = UiFactory.iconView(this, SkidIcons.PAUSE, UiFactory.COLOR_TEXT, 20f);
+        LinearLayout.LayoutParams pauseLp = new LinearLayout.LayoutParams(circleSize, circleSize);
+        homePauseBtn.setLayoutParams(pauseLp);
+        int pausePad = UiFactory.dp(this, 14);
+        homePauseBtn.setPadding(pausePad, pausePad, pausePad, pausePad);
+        homePauseBtn.setScaleType(ImageView.ScaleType.FIT_CENTER);
         homePauseBtn.setBackground(UiFactory.circleRing(this, UiFactory.COLOR_CARD, UiFactory.COLOR_BORDER, 1f));
         homePauseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -644,6 +651,9 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         homeStartPillBtn.setGravity(Gravity.CENTER);
         homeStartPillBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16.5f);
         homeStartPillBtn.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+        homeStartPillBtn.setCompoundDrawablesWithIntrinsicBounds(SkidIcons.drawable(this, SkidIcons.PLAY, Color.parseColor("#061018"), 18f), null, null, null);
+        homeStartPillBtn.setCompoundDrawablePadding(UiFactory.dp(this, 8));
+        homeStartPillBtn.setPadding(UiFactory.dp(this, 18), 0, UiFactory.dp(this, 18), 0);
         LinearLayout.LayoutParams startLp = new LinearLayout.LayoutParams(0, UiFactory.dp(this, 56), 1f);
         startLp.leftMargin = UiFactory.dp(this, 16);
         startLp.rightMargin = UiFactory.dp(this, 16);
@@ -655,12 +665,12 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
             }
         });
 
-        TextView modeDropBtn = new TextView(this);
-        modeDropBtn.setText("⌄");
-        modeDropBtn.setTextColor(UiFactory.COLOR_TEXT);
-        modeDropBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f);
-        modeDropBtn.setGravity(Gravity.CENTER);
-        modeDropBtn.setLayoutParams(new LinearLayout.LayoutParams(circleSize, circleSize));
+        ImageView modeDropBtn = UiFactory.iconView(this, SkidIcons.CHEVRON_DOWN, UiFactory.COLOR_TEXT, 18f);
+        LinearLayout.LayoutParams modeLp = new LinearLayout.LayoutParams(circleSize, circleSize);
+        modeDropBtn.setLayoutParams(modeLp);
+        int modePad = UiFactory.dp(this, 14);
+        modeDropBtn.setPadding(modePad, modePad, modePad, modePad);
+        modeDropBtn.setScaleType(ImageView.ScaleType.FIT_CENTER);
         modeDropBtn.setBackground(UiFactory.circleRing(this, UiFactory.COLOR_CARD, UiFactory.COLOR_BORDER, 1f));
         modeDropBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1282,7 +1292,9 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         }
 
         if (homePauseBtn != null) {
-            homePauseBtn.setText(paused ? "▶" : "⏸");
+            int pauseKind = paused ? SkidIcons.PLAY : SkidIcons.PAUSE;
+            homePauseBtn.setImageBitmap(SkidIcons.bitmap(pauseKind, UiFactory.COLOR_TEXT,
+                    SkidIcons.dpToPx(this, 20f)));
         }
 
         if (homeStartPillBtn != null) {
@@ -1290,14 +1302,17 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
                 homeStartPillBtn.setText("S T O P");
                 homeStartPillBtn.setTextColor(UiFactory.COLOR_TEXT);
                 homeStartPillBtn.setBackground(UiFactory.pill(this, Color.parseColor("#2A1822"), UiFactory.COLOR_CRIMSON, 1.8f));
+                homeStartPillBtn.setCompoundDrawablesWithIntrinsicBounds(SkidIcons.drawable(this, SkidIcons.STOP, UiFactory.COLOR_TEXT, 18f), null, null, null);
             } else if (paused) {
                 homeStartPillBtn.setText("R E S U M E");
                 homeStartPillBtn.setTextColor(Color.parseColor("#081018"));
                 homeStartPillBtn.setBackground(UiFactory.pill(this, UiFactory.COLOR_AMBER, UiFactory.COLOR_TEXT, 1.5f));
+                homeStartPillBtn.setCompoundDrawablesWithIntrinsicBounds(SkidIcons.drawable(this, SkidIcons.PLAY, Color.parseColor("#081018"), 18f), null, null, null);
             } else {
                 homeStartPillBtn.setText("S T A R T");
                 homeStartPillBtn.setTextColor(Color.parseColor("#061018"));
                 homeStartPillBtn.setBackground(UiFactory.pill(this, UiFactory.COLOR_SKY, Color.parseColor("#8A4E65"), 1.8f));
+                homeStartPillBtn.setCompoundDrawablesWithIntrinsicBounds(SkidIcons.drawable(this, SkidIcons.PLAY, Color.parseColor("#061018"), 18f), null, null, null);
             }
         }
 

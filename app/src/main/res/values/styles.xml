@@ -5,6 +5,9 @@
         <item name="android:colorPrimary">@color/skid_surface</item>
         <item name="android:colorPrimaryDark">@color/skid_bg</item>
         <item name="android:colorAccent">@color/skid_cyan</item>
+        <item name="android:colorControlActivated">@color/skid_cyan</item>
+        <item name="android:colorControlNormal">@color/skid_muted</item>
+        <item name="android:textColorSecondary">@color/skid_muted</item>
         <item name="android:statusBarColor">@color/skid_bg</item>
         <item name="android:navigationBarColor">@color/skid_surface</item>
     </style>

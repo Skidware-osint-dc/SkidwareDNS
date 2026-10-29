@@ -1,0 +1,42 @@
+# SKIDWAREDNS CUSTOM CONFIG [.skid] v5.3
+# Preset: Mullvad London UK gb-lon-wg-101 (xtom / 100 Gbps / Owned by Mullvad)
+
+===========
+DNS Servers [https://dns.mullvad.net/dns-query, 100.64.0.1:53]
+VPN Servers [45.66.219.3:51820, gb-lon-wg-101.relays.mullvad.net:51820]
+Addresses [10.64.0.2/32, fc00:bbbb:bbbb:bb01::2/128]
+SOCKS5 [gb-lon-wg-socks5-101.relays.mullvad.net:1080, 127.0.0.1:10808]
+VPN PORTS [51820, 3440, 443]
+PROXY PORTS [1080, 10808, 10809]
+DNS PORTS [443, 53]
+Custom DNS Server []
+Custom VPN Server [45.66.219.3:51820]
+Custom Proxy Server [gb-lon-wg-socks5-101.relays.mullvad.net:1080]
+Firewall Rules [BLOCK_DOMAIN:doubleclick.net]
+Allowed DNS Records [Auto]
+On-Device Blocklists [Adware & Trackers, Malware & Phishing]
+===========
+Tor enabled=false
+Mode=VPN+DNS+Firewall
+Name=Mullvad-London-100G
+Proxy mode=SOCKS5
+DNS Mode=Injector-DoH
+Quad9=Security
+DNSCrypt=Quad9 Security
+DNS-over-TLS=Cloudflare
+DNS-Proxy=Quad9
+Tunnel=WireGuard
+Connect-from-mode=Direct
+===========
+WG-Profile-Name=mullvad-gb-lon-wg-101
+WG-Enabled=true
+WG-Endpoint=45.66.219.3:51820
+WG-Public-Key=c63L5Zl92C7K0j3rsHDeEu6ZzEaG9PkA4sZeFRPhgHo=
+Injector-DoH-Provider=Mullvad
+Mullvad-Enabled=true
+Mullvad-Multihop=false
+Mullvad-Exit-Relay=gb-lon-wg-101
+Mullvad-DAITA=false
+Mullvad-Use-Socks5=true
+Mullvad-Owned-Only=true
+===========

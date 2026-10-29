@@ -1026,6 +1026,148 @@ public final class SkidConfigStore {
                 "===========\n"
         ));
 
+        list.add(new PresetTemplate(
+                "mullvad_sofia_daita.skid",
+                "Mullvad Bulgaria bg-sof-wg-001 (20 Gbps • Rented • DAITA)",
+                "Sofia bg-sof-wg-001 (146.70.188.130 • M247 20 Gbps • DAITA: Yes • SOCKS5 :1080 • Mullvad DoH)",
+                "# SKIDWAREDNS CUSTOM CONFIG [.skid] v5.3\n" +
+                "# Preset: Mullvad Sofia Bulgaria bg-sof-wg-001 (M247 / 20 Gbps / Rented / DAITA)\n\n" +
+                "===========\n" +
+                "DNS Servers [https://dns.mullvad.net/dns-query, 100.64.0.1:53]\n" +
+                "VPN Servers [146.70.188.130:51820, bg-sof-wg-001.relays.mullvad.net:51820]\n" +
+                "Addresses [10.64.0.2/32, fc00:bbbb:bbbb:bb01::2/128]\n" +
+                "SOCKS5 [bg-sof-wg-socks5-001.relays.mullvad.net:1080, 127.0.0.1:10808]\n" +
+                "VPN PORTS [51820, 3225, 443]\n" +
+                "PROXY PORTS [1080, 10808, 10809]\n" +
+                "DNS PORTS [443, 53]\n" +
+                "Custom DNS Server []\n" +
+                "Custom VPN Server [146.70.188.130:51820]\n" +
+                "Custom Proxy Server [bg-sof-wg-socks5-001.relays.mullvad.net:1080]\n" +
+                "Firewall Rules [BLOCK_DOMAIN:doubleclick.net]\n" +
+                "Allowed DNS Records [Auto]\n" +
+                "On-Device Blocklists [Adware & Trackers, Malware & Phishing]\n" +
+                "===========\n" +
+                "Tor enabled=false\n" +
+                "Mode=VPN+DNS+Firewall\n" +
+                "Name=Mullvad-Sofia-DAITA\n" +
+                "Proxy mode=SOCKS5\n" +
+                "DNS Mode=Injector-DoH\n" +
+                "Quad9=Security\n" +
+                "DNSCrypt=Quad9 Security\n" +
+                "DNS-over-TLS=Cloudflare\n" +
+                "DNS-Proxy=Quad9\n" +
+                "Tunnel=WireGuard\n" +
+                "Connect-from-mode=Direct\n" +
+                "===========\n" +
+                "WG-Profile-Name=mullvad-bg-sof-wg-001\n" +
+                "WG-Enabled=true\n" +
+                "WG-Endpoint=146.70.188.130:51820\n" +
+                "WG-Public-Key=J8KysHmHZWqtrVKKOppneDXSks/PDsB1XTlRHpwiABA=\n" +
+                "Injector-DoH-Provider=Mullvad\n" +
+                "Mullvad-Enabled=true\n" +
+                "Mullvad-Multihop=false\n" +
+                "Mullvad-Exit-Relay=bg-sof-wg-001\n" +
+                "Mullvad-DAITA=true\n" +
+                "Mullvad-Use-Socks5=true\n" +
+                "Mullvad-Owned-Only=false\n" +
+                "===========\n"
+        ));
+
+        list.add(new PresetTemplate(
+                "mullvad_london_100g.skid",
+                "Mullvad UK gb-lon-wg-101 (100 Gbps • Owned by Mullvad)",
+                "London gb-lon-wg-101 (45.66.219.3 • xtom 100 Gbps • Owned • SOCKS5 :1080 • Mullvad DoH)",
+                "# SKIDWAREDNS CUSTOM CONFIG [.skid] v5.3\n" +
+                "# Preset: Mullvad London UK gb-lon-wg-101 (xtom / 100 Gbps / Owned by Mullvad)\n\n" +
+                "===========\n" +
+                "DNS Servers [https://dns.mullvad.net/dns-query, 100.64.0.1:53]\n" +
+                "VPN Servers [45.66.219.3:51820, gb-lon-wg-101.relays.mullvad.net:51820]\n" +
+                "Addresses [10.64.0.2/32, fc00:bbbb:bbbb:bb01::2/128]\n" +
+                "SOCKS5 [gb-lon-wg-socks5-101.relays.mullvad.net:1080, 127.0.0.1:10808]\n" +
+                "VPN PORTS [51820, 3440, 443]\n" +
+                "PROXY PORTS [1080, 10808, 10809]\n" +
+                "DNS PORTS [443, 53]\n" +
+                "Custom DNS Server []\n" +
+                "Custom VPN Server [45.66.219.3:51820]\n" +
+                "Custom Proxy Server [gb-lon-wg-socks5-101.relays.mullvad.net:1080]\n" +
+                "Firewall Rules [BLOCK_DOMAIN:doubleclick.net]\n" +
+                "Allowed DNS Records [Auto]\n" +
+                "On-Device Blocklists [Adware & Trackers, Malware & Phishing]\n" +
+                "===========\n" +
+                "Tor enabled=false\n" +
+                "Mode=VPN+DNS+Firewall\n" +
+                "Name=Mullvad-London-100G\n" +
+                "Proxy mode=SOCKS5\n" +
+                "DNS Mode=Injector-DoH\n" +
+                "Quad9=Security\n" +
+                "DNSCrypt=Quad9 Security\n" +
+                "DNS-over-TLS=Cloudflare\n" +
+                "DNS-Proxy=Quad9\n" +
+                "Tunnel=WireGuard\n" +
+                "Connect-from-mode=Direct\n" +
+                "===========\n" +
+                "WG-Profile-Name=mullvad-gb-lon-wg-101\n" +
+                "WG-Enabled=true\n" +
+                "WG-Endpoint=45.66.219.3:51820\n" +
+                "WG-Public-Key=c63L5Zl92C7K0j3rsHDeEu6ZzEaG9PkA4sZeFRPhgHo=\n" +
+                "Injector-DoH-Provider=Mullvad\n" +
+                "Mullvad-Enabled=true\n" +
+                "Mullvad-Multihop=false\n" +
+                "Mullvad-Exit-Relay=gb-lon-wg-101\n" +
+                "Mullvad-DAITA=false\n" +
+                "Mullvad-Use-Socks5=true\n" +
+                "Mullvad-Owned-Only=true\n" +
+                "===========\n"
+        ));
+
+        list.add(new PresetTemplate(
+                "mullvad_copenhagen_to_sofia_multihop.skid",
+                "Mullvad WireGuard Multihop: Copenhagen dk-cph-wg-102 → Sofia bg-sof-wg-003",
+                "Entry dk-cph-wg-102 (149.88.109.73 • 100 Gbps Owned) → Exit bg-sof-wg-003 (Multihop Port 3100 • DAITA: Yes)",
+                "# SKIDWAREDNS CUSTOM CONFIG [.skid] v5.3\n" +
+                "# Preset: Mullvad True WireGuard Multihop (Copenhagen 100G Entry -> Sofia DAITA Exit :3100)\n\n" +
+                "===========\n" +
+                "DNS Servers [https://dns.mullvad.net/dns-query, 100.64.0.1:53]\n" +
+                "VPN Servers [149.88.109.73:3100, bg-sof-wg-003.relays.mullvad.net:51820]\n" +
+                "Addresses [10.64.0.2/32, fc00:bbbb:bbbb:bb01::2/128]\n" +
+                "SOCKS5 [bg-sof-wg-socks5-003.relays.mullvad.net:1080, 127.0.0.1:10808]\n" +
+                "VPN PORTS [3100, 51820]\n" +
+                "PROXY PORTS [1080, 10808, 10809]\n" +
+                "DNS PORTS [443, 53]\n" +
+                "Custom DNS Server []\n" +
+                "Custom VPN Server [149.88.109.73:3100]\n" +
+                "Custom Proxy Server [bg-sof-wg-socks5-003.relays.mullvad.net:1080]\n" +
+                "Firewall Rules [BLOCK_DOMAIN:doubleclick.net]\n" +
+                "Allowed DNS Records [Auto]\n" +
+                "On-Device Blocklists [Adware & Trackers, Malware & Phishing]\n" +
+                "===========\n" +
+                "Tor enabled=false\n" +
+                "Mode=VPN+DNS+Firewall\n" +
+                "Name=Mullvad-Multihop-CPH-to-SOF\n" +
+                "Proxy mode=SOCKS5\n" +
+                "DNS Mode=Injector-DoH\n" +
+                "Quad9=Security\n" +
+                "DNSCrypt=Quad9 Security\n" +
+                "DNS-over-TLS=Cloudflare\n" +
+                "DNS-Proxy=Quad9\n" +
+                "Tunnel=WireGuard\n" +
+                "Connect-from-mode=Direct\n" +
+                "===========\n" +
+                "WG-Profile-Name=mullvad-dk-cph-wg-102-to-bg-sof-wg-003\n" +
+                "WG-Enabled=true\n" +
+                "WG-Endpoint=149.88.109.73:3100\n" +
+                "WG-Public-Key=ug2e9Pdp5imXjuefrKqmYYzfMnC83whlLBj7eFi81UI=\n" +
+                "Injector-DoH-Provider=Mullvad\n" +
+                "Mullvad-Enabled=true\n" +
+                "Mullvad-Multihop=true\n" +
+                "Mullvad-Entry-Relay=dk-cph-wg-102\n" +
+                "Mullvad-Exit-Relay=bg-sof-wg-003\n" +
+                "Mullvad-DAITA=true\n" +
+                "Mullvad-Use-Socks5=true\n" +
+                "Mullvad-Owned-Only=false\n" +
+                "===========\n"
+        ));
+
         BUILTIN_PRESETS = Collections.unmodifiableList(list);
     }
 

@@ -4,7 +4,14 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
+    <!-- SkidwareDNS hexagon-U mark (QS tile) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.7"
+        android:strokeLineJoin="round"
+        android:pathData="M12,2.2 L20.4,7.05 L20.4,16.95 L12,21.8 L3.6,16.95 L3.6,7.05 Z" />
     <path
         android:fillColor="#FFFFFFFF"
-        android:pathData="M12,1L3,5v6c0,5.55 3.84,10.74 9,12 5.16,-1.26 9,-6.45 9,-12V5l-9,-4zM12,11.99h7c-0.53,4.12 -3.28,7.79 -7,8.94V12H5V6.3l7,-3.11v8.8z" />
+        android:pathData="M8.15,7.6 L10.85,7.6 L10.85,14.35 L13.15,14.35 L13.15,7.6 L15.85,7.6 L15.85,16.15 Q15.85,17.35 12,17.35 Q8.15,17.35 8.15,16.15 Z" />
 </vector>
