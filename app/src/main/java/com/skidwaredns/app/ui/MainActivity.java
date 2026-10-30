@@ -196,7 +196,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         navBar.setOrientation(LinearLayout.HORIZONTAL);
         navBar.setGravity(Gravity.CENTER_VERTICAL);
         navBar.setBackgroundColor(UiFactory.COLOR_SURFACE);
-        navBar.setPadding(UiFactory.dp(this, 6), UiFactory.dp(this, 8), UiFactory.dp(this, 6), UiFactory.dp(this, 10));
+        navBar.setPadding(UiFactory.dp(this, 6), UiFactory.dp(this, 10), UiFactory.dp(this, 6), UiFactory.dp(this, 12));
 
         int[] navIconKinds = new int[]{
                 SkidIcons.HOME, SkidIcons.STATS, SkidIcons.SKID, SkidIcons.SLIDERS, SkidIcons.LOGS
@@ -254,10 +254,13 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         for (int i = 0; i < navPills.size(); i++) {
             boolean sel = (i == idx);
             navPills.get(i).setBackground(sel
-                    ? UiFactory.roundedRect(this, UiFactory.COLOR_ICON_BG, Color.TRANSPARENT, 0f, 16f)
+                    ? UiFactory.roundedRect(this,
+                        UiFactory.mixColor(UiFactory.COLOR_ICON_BG, UiFactory.COLOR_SKY, 0.28f),
+                        UiFactory.mixColor(UiFactory.COLOR_SKY, UiFactory.COLOR_BORDER, 0.45f),
+                        0.9f, 16f)
                     : null);
-            navIcons.get(i).setColorFilter(sel ? UiFactory.COLOR_TEXT : UiFactory.COLOR_MUTED, PorterDuff.Mode.SRC_IN);
-            navLabels.get(i).setTextColor(sel ? UiFactory.COLOR_TEXT : UiFactory.COLOR_MUTED);
+            navIcons.get(i).setColorFilter(sel ? UiFactory.COLOR_SKY : UiFactory.COLOR_MUTED, PorterDuff.Mode.SRC_IN);
+            navLabels.get(i).setTextColor(sel ? UiFactory.COLOR_SKY : UiFactory.COLOR_MUTED);
         }
 
         contentContainer.removeAllViews();
@@ -419,9 +422,9 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
             LinearLayout tile = new LinearLayout(this);
             tile.setOrientation(LinearLayout.VERTICAL);
             tile.setGravity(Gravity.CENTER);
-            tile.setPadding(UiFactory.dp(this, 6), UiFactory.dp(this, 12), UiFactory.dp(this, 6), UiFactory.dp(this, 12));
-            tile.setBackground(UiFactory.roundedRect(this, UiFactory.COLOR_CARD, UiFactory.COLOR_BORDER, 0.8f, 14f));
-            ImageView g = UiFactory.iconView(this, toolIconKinds[ti], toolIconColors[ti], 22f);
+            tile.setPadding(UiFactory.dp(this, 8), UiFactory.dp(this, 14), UiFactory.dp(this, 8), UiFactory.dp(this, 14));
+            tile.setBackground(UiFactory.cardFill(this, UiFactory.COLOR_BORDER, 16f));
+            ImageView g = UiFactory.iconWell(this, toolIconKinds[ti], toolIconColors[ti], 44f, 22f);
             TextView n = UiFactory.label(this, toolNames[ti], 11.5f, UiFactory.COLOR_MUTED, true, false);
             n.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams nLp2 = new LinearLayout.LayoutParams(

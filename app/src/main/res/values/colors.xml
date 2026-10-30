@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="skid_bg">#0B0C0F</color>
-    <color name="skid_surface">#13151A</color>
-    <color name="skid_card">#191B21</color>
-    <color name="skid_cyan">#5CC8FF</color>
+    <color name="skid_bg">#07080B</color>
+    <color name="skid_surface">#101218</color>
+    <color name="skid_card">#161920</color>
+    <color name="skid_cyan">#6AD2FF</color>
     <color name="skid_emerald">#34D399</color>
     <color name="skid_amber">#FBBF24</color>
     <color name="skid_crimson">#EC4E6E</color>

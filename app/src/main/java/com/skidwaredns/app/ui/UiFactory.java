@@ -30,23 +30,24 @@ import java.util.List;
  */
 public final class UiFactory {
 
-    public static final int COLOR_BG = Color.parseColor("#0B0C0F");
-    public static final int COLOR_SURFACE = Color.parseColor("#13151A");
-    public static final int COLOR_CARD = Color.parseColor("#191B21");
+    public static final int COLOR_BG = Color.parseColor("#07080B");
+    public static final int COLOR_SURFACE = Color.parseColor("#101218");
+    public static final int COLOR_CARD = Color.parseColor("#161920");
+    public static final int COLOR_CARD_TOP = Color.parseColor("#1C2028");
     public static final int COLOR_CARD_SELECTED = Color.parseColor("#1B2838");
-    public static final int COLOR_ICON_BG = Color.parseColor("#242730");
-    public static final int COLOR_INPUT_BG = Color.parseColor("#111318");
-    public static final int COLOR_BORDER = Color.parseColor("#292D36");
-    public static final int COLOR_DIVIDER = Color.parseColor("#262932");
+    public static final int COLOR_ICON_BG = Color.parseColor("#22262F");
+    public static final int COLOR_INPUT_BG = Color.parseColor("#0E1015");
+    public static final int COLOR_BORDER = Color.parseColor("#2C313C");
+    public static final int COLOR_DIVIDER = Color.parseColor("#262B34");
 
-    public static final int COLOR_SKY = Color.parseColor("#5CC8FF");
-    public static final int COLOR_CYAN = Color.parseColor("#5CC8FF");
+    public static final int COLOR_SKY = Color.parseColor("#6AD2FF");
+    public static final int COLOR_CYAN = Color.parseColor("#6AD2FF");
     public static final int COLOR_EMERALD = Color.parseColor("#34D399");
     public static final int COLOR_AMBER = Color.parseColor("#FBBF24");
     public static final int COLOR_CRIMSON = Color.parseColor("#EC4E6E");
-    public static final int COLOR_PURPLE = Color.parseColor("#A855F7");
-    public static final int COLOR_TEXT = Color.parseColor("#F1F5F9");
-    public static final int COLOR_MUTED = Color.parseColor("#94A3B8");
+    public static final int COLOR_PURPLE = Color.parseColor("#A78BFA");
+    public static final int COLOR_TEXT = Color.parseColor("#F4F7FB");
+    public static final int COLOR_MUTED = Color.parseColor("#8B95A7");
     public static final int COLOR_SWITCH_THUMB_ON = Color.parseColor("#F8FBFF");
     public static final int COLOR_SWITCH_THUMB_OFF = Color.parseColor("#C5CDD8");
     public static final int COLOR_SWITCH_TRACK_ON = Color.parseColor("#5CC8FF");
@@ -118,7 +119,32 @@ public final class UiFactory {
         int px = dp(ctx, dpSize);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(px, px);
         iv.setLayoutParams(lp);
+        iv.setScaleType(ImageView.ScaleType.CENTER);
         return iv;
+    }
+
+    /** Accent-tinted rounded well with a centered line icon. */
+    public static ImageView iconWell(Context ctx, int kind, int accent, float wellDp, float iconDp) {
+        ImageView iv = new ImageView(ctx);
+        int well = dp(ctx, wellDp);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(well, well);
+        iv.setLayoutParams(lp);
+        iv.setScaleType(ImageView.ScaleType.CENTER);
+        iv.setImageBitmap(SkidIcons.bitmap(kind, accent, dp(ctx, iconDp)));
+        int bg = mixColor(COLOR_ICON_BG, accent, 0.22f);
+        iv.setBackground(roundedRect(ctx, bg, mixColor(accent, COLOR_BORDER, 0.55f), 0.7f, wellDp * 0.30f));
+        return iv;
+    }
+
+    public static int mixColor(int base, int tint, float amt) {
+        if (amt < 0f) amt = 0f;
+        if (amt > 1f) amt = 1f;
+        int br = Color.red(base), bg = Color.green(base), bb = Color.blue(base);
+        int tr = Color.red(tint), tg = Color.green(tint), tb = Color.blue(tint);
+        return Color.rgb(
+                (int) (br + (tr - br) * amt),
+                (int) (bg + (tg - bg) * amt),
+                (int) (bb + (tb - bb) * amt));
     }
 
     public static int dp(Context ctx, float dp) {
@@ -151,12 +177,23 @@ public final class UiFactory {
         return gd;
     }
 
+    public static GradientDrawable cardFill(Context ctx, int borderColor, float radiusDp) {
+        GradientDrawable gd = new GradientDrawable(
+                GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{COLOR_CARD_TOP, COLOR_CARD});
+        gd.setCornerRadius(dp(ctx, radiusDp));
+        if (borderColor != Color.TRANSPARENT) {
+            gd.setStroke(Math.max(1, dp(ctx, 1f)), borderColor);
+        }
+        return gd;
+    }
+
     public static LinearLayout card(Context ctx, int borderColor) {
         LinearLayout box = new LinearLayout(ctx);
         box.setOrientation(LinearLayout.VERTICAL);
-        int pad = dp(ctx, 15);
+        int pad = dp(ctx, 16);
         box.setPadding(pad, pad, pad, pad);
-        box.setBackground(roundedRect(ctx, COLOR_CARD, borderColor, borderColor == Color.TRANSPARENT ? 0f : 1f, 18f));
+        box.setBackground(cardFill(ctx, borderColor == Color.TRANSPARENT ? Color.TRANSPARENT : COLOR_BORDER, 18f));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.bottomMargin = dp(ctx, 14);
@@ -180,8 +217,10 @@ public final class UiFactory {
         TextView tv = new TextView(ctx);
         tv.setText(title);
         tv.setTextColor(COLOR_SKY);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12.5f);
         tv.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+        tv.setLetterSpacing(0.08f);
+        tv.setAllCaps(true);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.leftMargin = dp(ctx, 8);
@@ -223,16 +262,11 @@ public final class UiFactory {
         lp.bottomMargin = dp(ctx, 12);
         bar.setLayoutParams(lp);
 
-        ImageView backBtn = iconView(ctx, SkidIcons.CHEVRON_LEFT, COLOR_TEXT, 18f);
-        int sz = dp(ctx, 38);
-        LinearLayout.LayoutParams bLp = new LinearLayout.LayoutParams(sz, sz);
-        bLp.rightMargin = dp(ctx, 10);
+        ImageView backBtn = iconWell(ctx, SkidIcons.CHEVRON_LEFT, COLOR_TEXT, 40f, 18f);
+        LinearLayout.LayoutParams bLp = (LinearLayout.LayoutParams) backBtn.getLayoutParams();
+        bLp.rightMargin = dp(ctx, 12);
         backBtn.setLayoutParams(bLp);
-        int padIc = dp(ctx, 10);
-        backBtn.setPadding(padIc, padIc, padIc, padIc);
-        backBtn.setBackground(circleRing(ctx, COLOR_CARD, COLOR_BORDER, 1f));
         backBtn.setOnClickListener(onBack);
-        backBtn.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         LinearLayout col = new LinearLayout(ctx);
         col.setOrientation(LinearLayout.VERTICAL);
@@ -256,22 +290,17 @@ public final class UiFactory {
         int padH = dp(ctx, 14);
         int padV = dp(ctx, 15);
         row.setPadding(padH, padV, padH, padV);
-        row.setBackground(roundedRect(ctx, COLOR_CARD, COLOR_BORDER, 0.8f, 16f));
+        row.setBackground(cardFill(ctx, COLOR_BORDER, 18f));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.bottomMargin = dp(ctx, 11);
+        lp.bottomMargin = dp(ctx, 10);
         row.setLayoutParams(lp);
         row.setOnClickListener(onClick);
 
-        ImageView iconBox = iconView(ctx, SkidIcons.iconForGlyph(glyph), COLOR_SKY, 20f);
-        int isz = dp(ctx, 44);
-        LinearLayout.LayoutParams iLp = new LinearLayout.LayoutParams(isz, isz);
+        ImageView iconBox = iconWell(ctx, SkidIcons.iconForGlyph(glyph), COLOR_SKY, 46f, 22f);
+        LinearLayout.LayoutParams iLp = (LinearLayout.LayoutParams) iconBox.getLayoutParams();
         iLp.rightMargin = dp(ctx, 14);
         iconBox.setLayoutParams(iLp);
-        int ip = dp(ctx, 12);
-        iconBox.setPadding(ip, ip, ip, ip);
-        iconBox.setBackground(roundedRect(ctx, COLOR_ICON_BG, Color.TRANSPARENT, 0f, 12f));
-        iconBox.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         LinearLayout col = new LinearLayout(ctx);
         col.setOrientation(LinearLayout.VERTICAL);
@@ -279,8 +308,7 @@ public final class UiFactory {
         col.addView(label(ctx, title, 16f, COLOR_TEXT, true, false));
         col.addView(label(ctx, subtitle, 12.5f, COLOR_MUTED, false, false));
 
-        TextView chev = label(ctx, "›", 20f, COLOR_MUTED, false, false);
-        chev.setPadding(dp(ctx, 8), 0, dp(ctx, 2), 0);
+        ImageView chev = iconView(ctx, SkidIcons.CHEVRON_RIGHT, COLOR_MUTED, 16f);
 
         row.addView(iconBox);
         row.addView(col);
@@ -298,11 +326,10 @@ public final class UiFactory {
         row.setGravity(Gravity.CENTER_VERTICAL);
         row.setPadding(dp(ctx, 2), dp(ctx, 6), dp(ctx, 2), dp(ctx, 6));
 
-        ImageView icon = iconView(ctx, SkidIcons.iconForGlyph(glyph), COLOR_SKY, 18f);
-        LinearLayout.LayoutParams iLp = new LinearLayout.LayoutParams(dp(ctx, 28), dp(ctx, 28));
-        iLp.rightMargin = dp(ctx, 10);
+        ImageView icon = iconWell(ctx, SkidIcons.iconForGlyph(glyph), COLOR_SKY, 32f, 16f);
+        LinearLayout.LayoutParams iLp = (LinearLayout.LayoutParams) icon.getLayoutParams();
+        iLp.rightMargin = dp(ctx, 12);
         icon.setLayoutParams(iLp);
-        icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         LinearLayout textCol = new LinearLayout(ctx);
         textCol.setOrientation(LinearLayout.VERTICAL);
@@ -353,11 +380,10 @@ public final class UiFactory {
         row.setPadding(dp(ctx, 2), dp(ctx, 8), dp(ctx, 2), dp(ctx, 8));
         row.setOnClickListener(onClick);
 
-        ImageView icon = iconView(ctx, SkidIcons.iconForGlyph(glyph), COLOR_SKY, 18f);
-        LinearLayout.LayoutParams iLp = new LinearLayout.LayoutParams(dp(ctx, 28), dp(ctx, 28));
-        iLp.rightMargin = dp(ctx, 10);
+        ImageView icon = iconWell(ctx, SkidIcons.iconForGlyph(glyph), COLOR_SKY, 32f, 16f);
+        LinearLayout.LayoutParams iLp = (LinearLayout.LayoutParams) icon.getLayoutParams();
+        iLp.rightMargin = dp(ctx, 12);
         icon.setLayoutParams(iLp);
-        icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         LinearLayout textCol = new LinearLayout(ctx);
         textCol.setOrientation(LinearLayout.VERTICAL);
@@ -372,8 +398,7 @@ public final class UiFactory {
             textCol.addView(sub);
         }
 
-        TextView chev = label(ctx, "›", 20f, COLOR_TEXT, false, false);
-        chev.setPadding(dp(ctx, 8), 0, dp(ctx, 4), 0);
+        ImageView chev = iconView(ctx, SkidIcons.CHEVRON_RIGHT, COLOR_MUTED, 14f);
 
         row.addView(icon);
         row.addView(textCol);
@@ -505,11 +530,12 @@ public final class UiFactory {
         btn.setText(text);
         btn.setAllCaps(false);
         btn.setTextColor(textColor);
-        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f);
         btn.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
         btn.setGravity(Gravity.CENTER);
-        btn.setPadding(dp(ctx, 12), dp(ctx, 10), dp(ctx, 12), dp(ctx, 10));
-        btn.setBackground(roundedRect(ctx, bgColor, strokeColor, 1.2f, 12f));
+        btn.setPadding(dp(ctx, 14), dp(ctx, 12), dp(ctx, 14), dp(ctx, 12));
+        btn.setBackground(roundedRect(ctx, bgColor, strokeColor, 1.1f, 14f));
+        btn.setMinHeight(dp(ctx, 44));
         btn.setCompoundDrawablesWithIntrinsicBounds(SkidIcons.drawable(ctx, iconKind, textColor, 15f), null, null, null);
         btn.setCompoundDrawablePadding(dp(ctx, 6));
         return btn;
@@ -675,14 +701,13 @@ public final class UiFactory {
         final LinearLayout bar = new LinearLayout(ctx);
         bar.setOrientation(LinearLayout.HORIZONTAL);
         bar.setGravity(Gravity.CENTER_VERTICAL);
-        bar.setPadding(dp(ctx, 14), dp(ctx, 12), dp(ctx, 12), dp(ctx, 12));
-        bar.setBackground(roundedRect(ctx, COLOR_CARD, accent, 1f, 14f));
+        bar.setPadding(dp(ctx, 12), dp(ctx, 12), dp(ctx, 12), dp(ctx, 12));
+        bar.setBackground(cardFill(ctx, mixColor(accent, COLOR_BORDER, 0.55f), 16f));
 
-        ImageView ic = iconView(ctx, SkidIcons.iconForGlyph(glyph), accent, 16f);
-        LinearLayout.LayoutParams icLp = new LinearLayout.LayoutParams(dp(ctx, 22), dp(ctx, 22));
-        icLp.rightMargin = dp(ctx, 8);
+        ImageView ic = iconWell(ctx, SkidIcons.iconForGlyph(glyph), accent, 32f, 16f);
+        LinearLayout.LayoutParams icLp = (LinearLayout.LayoutParams) ic.getLayoutParams();
+        icLp.rightMargin = dp(ctx, 10);
         ic.setLayoutParams(icLp);
-        ic.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         LinearLayout textCol = new LinearLayout(ctx);
         textCol.setOrientation(LinearLayout.VERTICAL);
@@ -727,7 +752,7 @@ public final class UiFactory {
         tile.setOrientation(LinearLayout.VERTICAL);
         int pad = dp(ctx, 14);
         tile.setPadding(pad, pad, pad, pad);
-        tile.setBackground(roundedRect(ctx, COLOR_CARD, COLOR_BORDER, 0.8f, 16f));
+        tile.setBackground(cardFill(ctx, COLOR_BORDER, 18f));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
         tile.setLayoutParams(lp);
         tile.setOnClickListener(onClick);
@@ -735,15 +760,10 @@ public final class UiFactory {
         LinearLayout top = new LinearLayout(ctx);
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
-        ImageView ic = iconView(ctx, SkidIcons.iconForGlyph(glyph), accent, 18f);
-        int sz = dp(ctx, 34);
-        LinearLayout.LayoutParams icLp = new LinearLayout.LayoutParams(sz, sz);
-        icLp.rightMargin = dp(ctx, 8);
+        ImageView ic = iconWell(ctx, SkidIcons.iconForGlyph(glyph), accent, 36f, 18f);
+        LinearLayout.LayoutParams icLp = (LinearLayout.LayoutParams) ic.getLayoutParams();
+        icLp.rightMargin = dp(ctx, 10);
         ic.setLayoutParams(icLp);
-        int ipad = dp(ctx, 8);
-        ic.setPadding(ipad, ipad, ipad, ipad);
-        ic.setBackground(roundedRect(ctx, COLOR_ICON_BG, Color.TRANSPARENT, 0f, 11f));
-        ic.setScaleType(ImageView.ScaleType.FIT_CENTER);
         top.addView(ic);
         top.addView(label(ctx, toolName, 12.5f, COLOR_TEXT, true, false));
 
@@ -792,11 +812,10 @@ public final class UiFactory {
         row.setPadding(dp(ctx, 2), dp(ctx, 9), dp(ctx, 2), dp(ctx, 9));
         row.setOnClickListener(onClick);
 
-        ImageView icon = iconView(ctx, SkidIcons.iconForGlyph(glyph), COLOR_SKY, 16f);
-        LinearLayout.LayoutParams iLp = new LinearLayout.LayoutParams(dp(ctx, 22), dp(ctx, 22));
-        iLp.rightMargin = dp(ctx, 8);
+        ImageView icon = iconWell(ctx, SkidIcons.iconForGlyph(glyph), COLOR_SKY, 28f, 14f);
+        LinearLayout.LayoutParams iLp = (LinearLayout.LayoutParams) icon.getLayoutParams();
+        iLp.rightMargin = dp(ctx, 10);
         icon.setLayoutParams(iLp);
-        icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         TextView t = label(ctx, title, 14.5f, COLOR_TEXT, false, false);
         t.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));

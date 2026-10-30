@@ -1,3 +1,9 @@
+# SkidwareDNS v5.8 ("Icons & chrome") — `5.8.0-skid` (`versionCode 580`)
+
+Line icons redrawn Lucide-style (thicker round stroke, 3× supersample). Hub/settings rows sit in accent-tinted wells. Cards use a top-to-bottom wash. Selected tab is sky, not grey-on-grey. Tools glyphs (FTP, SSH, RADAR…) no longer collapse to a dot.
+
+---
+
 # SkidwareDNS v5.7 ("Tools hub") — `5.7.0-skid` (`versionCode 570`)
 
 Configure → **Tools** (or the Tools tile on the hub) folds six LAN utilities into this APK, reimplemented in Java — not a copy of those projects:
@@ -241,7 +247,7 @@ The tool count grew to 25 screens across five vendors; v5.2 reorganises them ins
 
 ```bash
 ./build_apk.sh
-# Outputs v5.7 (570 / 5.7.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
+# Outputs v5.8 (580 / 5.8.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
 
 # Host-JVM verification + .skid preset export (81 checks)
 java -cp <classes> VerifySkidV51 /home/user/SkidwareDNS/configs
