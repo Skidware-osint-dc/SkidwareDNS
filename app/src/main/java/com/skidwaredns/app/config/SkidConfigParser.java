@@ -217,6 +217,7 @@ public final class SkidConfigParser {
     private static void applyDirective(SkidConfig cfg, String rawKey, String val, List<String> warnings, int lineNo) {
         String k = normalizeKey(rawKey);
         if (val.isEmpty()) return;
+        if (applyDirectiveV6(cfg, k, val)) return;
         switch (k) {
             case "torenabled": cfg.torEnabled = parseBool(val, false); break;
             case "dnscryptmoduleenabled": cfg.dnscryptModuleEnabled = parseBool(val, true); break;
@@ -831,6 +832,66 @@ public final class SkidConfigParser {
         sb.append("Tools-Ssh-Command=").append(nullSafe(c.toolsSshCommand)).append('\n');
         sb.append("Tools-Mirror-Src=").append(nullSafe(c.toolsMirrorSrc)).append('\n');
         sb.append("Tools-Mirror-Dst=").append(nullSafe(c.toolsMirrorDst)).append('\n');
+        sb.append("TCP-Linger-Sec=").append(c.tcpLingerSec).append('\n');
+        sb.append("TCP-Keepalive-Count=").append(c.tcpKeepaliveCount).append('\n');
+        sb.append("TCP-SACK=").append(c.tcpSack).append('\n');
+        sb.append("TCP-Timestamps=").append(c.tcpTimestamps).append('\n');
+        sb.append("TCP-TW-Reuse=").append(c.tcpTwReuse).append('\n');
+        sb.append("TCP-FIN-Timeout-Sec=").append(c.tcpFinTimeoutSec).append('\n');
+        sb.append("TCP-Pacing=").append(c.tcpPacing).append('\n');
+        sb.append("TCP-Max-SYN-Backlog=").append(c.tcpMaxSynBacklog).append('\n');
+        sb.append("UDP-DontFrag=").append(c.udpDontFrag).append('\n');
+        sb.append("UDP-GRO-Hint=").append(c.udpGroHint).append('\n');
+        sb.append("UDP-Hairpin=").append(c.udpHairpin).append('\n');
+        sb.append("UDP-Multicast-TTL=").append(c.udpMulticastTtl).append('\n');
+        sb.append("UDP-NAT-Max-Entries=").append(c.udpNatMaxEntries).append('\n');
+        sb.append("UDP-Connect-Timeout-Ms=").append(c.udpConnectTimeoutMs).append('\n');
+        sb.append("SO-Linger-Sec=").append(c.soLingerSec).append('\n');
+        sb.append("SO-Priority=").append(c.soPriority).append('\n');
+        sb.append("SO-Mark=").append(c.soMark).append('\n');
+        sb.append("Socket-DualStack=").append(c.socketDualStack).append('\n');
+        sb.append("SO-BindToDevice=").append(nullSafe(c.soBindToDevice)).append('\n');
+        sb.append("SOCKS5-Auth-User=").append(nullSafe(c.socks5AuthUser)).append('\n');
+        sb.append("SOCKS5-Auth-Pass=").append(nullSafe(c.socks5AuthPass)).append('\n');
+        sb.append("SOCKS5-UDP-Associate=").append(c.socks5UdpAssociate).append('\n');
+        sb.append("SOCKS5-Remote-DNS=").append(c.socks5RemoteDns).append('\n');
+        sb.append("SOCKS5-Connect-Timeout-Ms=").append(c.socks5ConnectTimeoutMs).append('\n');
+        sb.append("HTTP-CONNECT-User=").append(nullSafe(c.httpConnectUser)).append('\n');
+        sb.append("HTTP-CONNECT-Pass=").append(nullSafe(c.httpConnectPass)).append('\n');
+        sb.append("WG-Private-Key=").append(nullSafe(c.wgPrivateKey)).append('\n');
+        sb.append("WG-AllowedIPs=").append(nullSafe(c.wgAllowedIps)).append('\n');
+        sb.append("WG-DNS=").append(nullSafe(c.wgDns)).append('\n');
+        sb.append("WG-Listen-Port=").append(c.wgListenPort).append('\n');
+        sb.append("WG-Keepalive-Sec=").append(c.wgKeepaliveSec).append('\n');
+        sb.append("WG-MTU=").append(c.wgMtu).append('\n');
+        sb.append("WG-Preshared-Key=").append(nullSafe(c.wgPresharedKey)).append('\n');
+        sb.append("Orbot-SOCKS-Host=").append(nullSafe(c.orbotSocksHost)).append('\n');
+        sb.append("Orbot-SOCKS-Port=").append(c.orbotSocksPort).append('\n');
+        sb.append("Orbot-HTTP-Port=").append(c.orbotHttpPort).append('\n');
+        sb.append("Orbot-Control-Port=").append(c.orbotControlPort).append('\n');
+        sb.append("Orbot-VPN-Mode=").append(c.orbotVpnMode).append('\n');
+        sb.append("Orbot-Start-On-Connect=").append(c.orbotStartOnConnect).append('\n');
+        sb.append("Tor-Newnym-On-Start=").append(c.torNewnymOnStart).append('\n');
+        sb.append("Tor-Circuit-Timeout-Sec=").append(c.torCircuitTimeoutSec).append('\n');
+        sb.append("I2P-Inbound-Length=").append(c.i2pInboundLength).append('\n');
+        sb.append("I2P-Outbound-Length=").append(c.i2pOutboundLength).append('\n');
+        sb.append("I2P-Inbound-Qty=").append(c.i2pInboundQty).append('\n');
+        sb.append("I2P-Outbound-Qty=").append(c.i2pOutboundQty).append('\n');
+        sb.append("I2P-Hidden-Mode=").append(c.i2pHiddenMode).append('\n');
+        sb.append("VPN-AlwaysOn-Hint=").append(c.vpnAlwaysOnHint).append('\n');
+        sb.append("VPN-Block-IPv6=").append(c.vpnBlockIpv6).append('\n');
+        sb.append("Network-Happy-Eyeballs=").append(c.networkHappyEyeballs).append('\n');
+        sb.append("Network-Happy-Delay-Ms=").append(c.networkHappyDelayMs).append('\n');
+        sb.append("Network-Captive-Bypass=").append(c.networkCaptiveBypass).append('\n');
+        sb.append("Network-Prefer-WiFi=").append(c.networkPreferWifi).append('\n');
+        sb.append("HTTPS-Max-TLS=").append(nullSafe(c.httpsMaxTls)).append('\n');
+        sb.append("HTTPS-TLS13-Only=").append(c.httpsTls13Only).append('\n');
+        sb.append("HTTPS-OCSP-Stapling=").append(c.httpsOcspStapling).append('\n');
+        sb.append("HTTPS-Cert-Pin-Strict=").append(c.httpsCertPinStrict).append('\n');
+        sb.append("HTTPS-GREASE=").append(c.httpsGrease).append('\n');
+        sb.append("HTTPS-ECH=").append(c.httpsEchEnabled).append('\n');
+        sb.append("HTTPS-H3-Alt=").append(c.httpsH3Alt).append('\n');
+        sb.append("HTTPS-Trust-System=").append(c.httpsTrustSystem).append('\n');
         sb.append("DPI-Strategy=").append(nullSafe(c.dpiStrategy)).append('\n');
         sb.append("DPI-Technique=").append(nullSafe(c.dpiTechnique)).append('\n');
         sb.append("TLS-Record-Split-Bytes=").append(c.tlsRecordSplitBytes).append('\n');
@@ -947,6 +1008,75 @@ public final class SkidConfigParser {
             }
         }
         return out;
+    }
+
+    /** v6.0 Stack Lab keys — split out so applyDirective stays under the 64KB method limit. */
+    private static boolean applyDirectiveV6(SkidConfig cfg, String k, String val) {
+        switch (k) {
+            case "tcplingersec": cfg.tcpLingerSec = Math.max(0, Math.min(120, parseInt(val, 0))); return true;
+            case "tcpkeepalivecount": cfg.tcpKeepaliveCount = Math.max(1, Math.min(16, parseInt(val, 4))); return true;
+            case "tcpsack": cfg.tcpSack = parseBool(val, true); return true;
+            case "tcptimestamps": cfg.tcpTimestamps = parseBool(val, true); return true;
+            case "tcptwreuse": cfg.tcpTwReuse = parseBool(val, true); return true;
+            case "tcpfintimeoutsec": cfg.tcpFinTimeoutSec = Math.max(5, Math.min(300, parseInt(val, 60))); return true;
+            case "tcppacing": cfg.tcpPacing = parseBool(val, false); return true;
+            case "tcpmaxsynbacklog": cfg.tcpMaxSynBacklog = Math.max(8, Math.min(1024, parseInt(val, 128))); return true;
+            case "udpdontfrag": cfg.udpDontFrag = parseBool(val, true); return true;
+            case "udpgrohint": cfg.udpGroHint = parseBool(val, false); return true;
+            case "udphairpin": cfg.udpHairpin = parseBool(val, false); return true;
+            case "udpmulticastttl": cfg.udpMulticastTtl = Math.max(0, Math.min(32, parseInt(val, 1))); return true;
+            case "udpnatmaxentries": cfg.udpNatMaxEntries = Math.max(64, Math.min(65536, parseInt(val, 4096))); return true;
+            case "udpconnecttimeoutms": cfg.udpConnectTimeoutMs = Math.max(200, Math.min(15000, parseInt(val, 1500))); return true;
+            case "solingersec": cfg.soLingerSec = Math.max(0, Math.min(120, parseInt(val, 0))); return true;
+            case "sopriority": cfg.soPriority = Math.max(0, Math.min(6, parseInt(val, 0))); return true;
+            case "somark": cfg.soMark = Math.max(0, Math.min(65535, parseInt(val, 0))); return true;
+            case "socketdualstack": cfg.socketDualStack = parseBool(val, true); return true;
+            case "sobinddevice":
+            case "sobindtodevice": cfg.soBindToDevice = val; return true;
+            case "socks5authuser": cfg.socks5AuthUser = val; return true;
+            case "socks5authpass": cfg.socks5AuthPass = val; return true;
+            case "socks5udpassociate": cfg.socks5UdpAssociate = parseBool(val, true); return true;
+            case "socks5remotedns": cfg.socks5RemoteDns = parseBool(val, true); return true;
+            case "socks5connecttimeoutms": cfg.socks5ConnectTimeoutMs = Math.max(500, Math.min(60000, parseInt(val, 8000))); return true;
+            case "httpconnectuser": cfg.httpConnectUser = val; return true;
+            case "httpconnectpass": cfg.httpConnectPass = val; return true;
+            case "wgprivatekey": cfg.wgPrivateKey = val; return true;
+            case "wgallowedips": cfg.wgAllowedIps = val; return true;
+            case "wgdns": cfg.wgDns = val; return true;
+            case "wglistenport": cfg.wgListenPort = Math.max(0, Math.min(64000, parseInt(val, 51820))); return true;
+            case "wgkeepalivesec": cfg.wgKeepaliveSec = Math.max(0, Math.min(600, parseInt(val, 25))); return true;
+            case "wgmtu": cfg.wgMtu = Math.max(1280, Math.min(1500, parseInt(val, 1420))); return true;
+            case "wgpresharedkey": cfg.wgPresharedKey = val; return true;
+            case "orbotsockshost": cfg.orbotSocksHost = val; return true;
+            case "orbotsocksport": cfg.orbotSocksPort = Math.max(1, Math.min(65535, parseInt(val, 9050))); return true;
+            case "orbothttpport": cfg.orbotHttpPort = Math.max(1, Math.min(65535, parseInt(val, 8118))); return true;
+            case "orbotcontrolport": cfg.orbotControlPort = Math.max(1, Math.min(65535, parseInt(val, 9051))); return true;
+            case "orbotvpnmode": cfg.orbotVpnMode = parseBool(val, false); return true;
+            case "orbotstartonconnect": cfg.orbotStartOnConnect = parseBool(val, true); return true;
+            case "tornewnymonstart": cfg.torNewnymOnStart = parseBool(val, false); return true;
+            case "torcircuittimeoutsec": cfg.torCircuitTimeoutSec = Math.max(5, Math.min(600, parseInt(val, 60))); return true;
+            case "i2pinboundlength": cfg.i2pInboundLength = Math.max(0, Math.min(7, parseInt(val, 3))); return true;
+            case "i2poutboundlength": cfg.i2pOutboundLength = Math.max(0, Math.min(7, parseInt(val, 3))); return true;
+            case "i2pinboundqty": cfg.i2pInboundQty = Math.max(1, Math.min(16, parseInt(val, 2))); return true;
+            case "i2poutboundqty": cfg.i2pOutboundQty = Math.max(1, Math.min(16, parseInt(val, 2))); return true;
+            case "i2phiddenmode": cfg.i2pHiddenMode = parseBool(val, false); return true;
+            case "vpnalwaysonhint": cfg.vpnAlwaysOnHint = parseBool(val, false); return true;
+            case "vpnblockipv6": cfg.vpnBlockIpv6 = parseBool(val, false); return true;
+            case "networkhappyeyeballs": cfg.networkHappyEyeballs = parseBool(val, true); return true;
+            case "networkhappydelayms": cfg.networkHappyDelayMs = Math.max(0, Math.min(2000, parseInt(val, 250))); return true;
+            case "networkcaptivebypass": cfg.networkCaptiveBypass = parseBool(val, true); return true;
+            case "networkpreferwifi": cfg.networkPreferWifi = parseBool(val, false); return true;
+            case "httpsmaxtls": cfg.httpsMaxTls = val; return true;
+            case "httpstls13only": cfg.httpsTls13Only = parseBool(val, false); return true;
+            case "httpsocspstapling": cfg.httpsOcspStapling = parseBool(val, true); return true;
+            case "httpscertpinstrict": cfg.httpsCertPinStrict = parseBool(val, false); return true;
+            case "httpsgrease": cfg.httpsGrease = parseBool(val, true); return true;
+            case "httpsech":
+            case "httpsechenabled": cfg.httpsEchEnabled = parseBool(val, false); return true;
+            case "httpsh3alt": cfg.httpsH3Alt = parseBool(val, false); return true;
+            case "httpstrustsystem": cfg.httpsTrustSystem = parseBool(val, true); return true;
+            default: return false;
+        }
     }
 
     private static String normalizeKey(String key) {

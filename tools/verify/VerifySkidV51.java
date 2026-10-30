@@ -236,6 +236,47 @@ public final class VerifySkidV51 {
         check(com.skidwaredns.app.util.SkidEventBus.formatBytes(3L * 1024 * 1024).contains("MB"), "format MB");
         check(com.skidwaredns.app.util.SkidEventBus.formatBytes(2L * 1024 * 1024 * 1024).contains("GB"), "format GB");
 
+        System.out.println("== 8. v6.0 Stack Lab + onboarding + TLS 1.3-only ==");
+        check(com.skidwaredns.app.ui.StackLabScreens.SUB_STACK_LAB == 50, "Stack Lab sub id 50");
+        check(com.skidwaredns.app.ui.OnboardingScreens.TITLES.length == 6, "6 onboarding pages");
+        check(com.skidwaredns.app.ui.OnboardingScreens.BODIES.length == 6, "6 onboarding bodies");
+        check(com.skidwaredns.app.ui.OnboardingScreens.TITLES[0].contains("SkidwareDNS"), "welcome title");
+        SkidConfig v6 = new SkidConfig();
+        check(v6.tcpLingerSec == 0, "TCP linger default 0");
+        check(v6.socks5UdpAssociate, "SOCKS UDP associate default on");
+        check(v6.wgKeepaliveSec == 25, "WG keepalive default 25");
+        check(v6.orbotSocksPort == 9050, "Orbot SOCKS 9050");
+        check(v6.i2pInboundLength == 3, "I2P inbound length 3");
+        check(!v6.httpsTls13Only, "TLS 1.3-only default off");
+        v6.tcpLingerSec = 7;
+        v6.socks5AuthUser = "alice";
+        v6.wgKeepaliveSec = 15;
+        v6.httpsTls13Only = true;
+        v6.orbotSocksPort = 9150;
+        v6.i2pInboundLength = 5;
+        v6.udpDontFrag = false;
+        v6.networkHappyDelayMs = 100;
+        String v6s = SkidConfigParser.serialize(v6);
+        check(v6s.contains("TCP-Linger-Sec=7"), "serialize linger");
+        check(v6s.contains("SOCKS5-Auth-User=alice"), "serialize socks user");
+        check(v6s.contains("HTTPS-TLS13-Only=true"), "serialize tls13-only");
+        SkidConfig v6b = SkidConfigParser.parse(v6s).config;
+        check(v6b.tcpLingerSec == 7, "linger round-trip");
+        check("alice".equals(v6b.socks5AuthUser), "socks user round-trip");
+        check(v6b.wgKeepaliveSec == 15, "WG keepalive round-trip");
+        check(v6b.httpsTls13Only, "tls13-only round-trip");
+        check(v6b.orbotSocksPort == 9150, "Orbot port round-trip");
+        check(v6b.i2pInboundLength == 5, "I2P length round-trip");
+        check(!v6b.udpDontFrag, "UDP DontFrag round-trip");
+        check(v6b.networkHappyDelayMs == 100, "Happy Eyeballs delay round-trip");
+        String[] p13 = com.skidwaredns.app.proxy.SocketStack.enabledProtocols(v6b);
+        check(p13.length == 1 && "TLSv1.3".equals(p13[0]), "enabledProtocols TLS 1.3 only");
+        v6b.httpsTls13Only = false;
+        v6b.httpsMaxTls = "TLS 1.2";
+        v6b.httpsMinTls = "TLS 1.2";
+        String[] p12 = com.skidwaredns.app.proxy.SocketStack.enabledProtocols(v6b);
+        check(p12.length == 1 && "TLSv1.2".equals(p12[0]), "enabledProtocols TLS 1.2 max");
+
         System.out.println();
         System.out.println(failures == 0 ? "PASS: VerifySkidV51 (" + checks + " checks)"
                 : "FAIL: " + failures + "/" + checks + " checks");

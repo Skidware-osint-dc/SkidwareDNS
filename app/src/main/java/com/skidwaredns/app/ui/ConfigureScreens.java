@@ -88,6 +88,8 @@ public final class ConfigureScreens {
             case ToolScreens.SUB_PORTCHECK:
             case ToolScreens.SUB_MIRROR:
                 return ToolScreens.build(ctx, subId, host);
+            case StackLabScreens.SUB_STACK_LAB:
+                return StackLabScreens.build(ctx, host);
             case SUB_ANTICENSORSHIP: return buildAntiCensorshipScreen(ctx, host);
             case SUB_NETWORK: return buildNetworkScreen(ctx, host);
             case SUB_GENERAL: return buildGeneralSettingsScreen(ctx, host);
@@ -145,7 +147,7 @@ public final class ConfigureScreens {
         headLeft.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         headLeft.addView(UiFactory.label(ctx, "Configure", 22f, UiFactory.COLOR_TEXT, true, false));
         headLeft.addView(UiFactory.label(ctx, "Every tool, one place \u2022 search or drill in", 12f, UiFactory.COLOR_MUTED, false, false));
-        TextView verChip = UiFactory.counterChip(ctx, "v5.9", UiFactory.COLOR_SKY);
+        TextView verChip = UiFactory.counterChip(ctx, "v6.0", UiFactory.COLOR_SKY);
         LinearLayout headRight = new LinearLayout(ctx);
         headRight.setOrientation(LinearLayout.HORIZONTAL);
         headRight.setGravity(Gravity.CENTER_VERTICAL);
@@ -198,6 +200,21 @@ public final class ConfigureScreens {
                         UiFactory.COLOR_AMBER, navTo(host, OpenPortScreens.SUB_OPEN_PORT)));
         col.addView(tileRow3);
 
+        LinearLayout tileRow4 = UiFactory.taskTileRow(ctx,
+                UiFactory.taskTile(ctx, "\u2699", "STACK LAB",
+                        "TCP · UDP · SOCKS · WG · Tor · TLS",
+                        "Tune the stack",
+                        UiFactory.COLOR_SKY, navTo(host, StackLabScreens.SUB_STACK_LAB)),
+                UiFactory.taskTile(ctx, "\uD83D\uDD10", "HTTPS / TLS",
+                        cfg.httpsMinTls + (cfg.httpsTls13Only ? " · 1.3-only" : " \u2022 " + cfg.httpsAlpn),
+                        "Pin, ALPN, GREASE",
+                        UiFactory.COLOR_SKY, navTo(host, SUB_HTTPS)));
+        col.addView(tileRow4);
+        UiFactory.fadeIn(tileRow1, 0);
+        UiFactory.fadeIn(tileRow2, 50);
+        UiFactory.fadeIn(tileRow3, 100);
+        UiFactory.fadeIn(tileRow4, 150);
+
         // ---- Search ------------------------------------------------------
         final LinearLayout sectionsHolder = new LinearLayout(ctx);
         sectionsHolder.setOrientation(LinearLayout.VERTICAL);
@@ -213,8 +230,8 @@ public final class ConfigureScreens {
 
         renderSectionDirectory(ctx, host, cfg, sectionsHolder, "");
 
-        col.addView(UiFactory.versionFooter(ctx, "v 5 . 3",
-                "23 presets \u2022 23 Mullvad relays \u2022 " + cfg.name + ".skid"));
+        col.addView(UiFactory.versionFooter(ctx, "v 6 . 0",
+                "Stack Lab \u2022 first-run intro \u2022 " + cfg.name + ".skid"));
 
         sv.addView(col);
         return sv;
@@ -340,6 +357,10 @@ public final class ConfigureScreens {
         perf.add(new UiFactory.SettingEntry("\u2699", "TCP / IP & UDP",
                 "Buffer " + cfg.socketBufferSizeKb + " KB \u2022 " + cfg.tcpCongestion + " \u2022 keepalive " + cfg.tcpKeepaliveIdleSec + "s",
                 UiFactory.COLOR_AMBER, 0, navTo(host, SUB_TCPIP_UDP)));
+        perf.add(new UiFactory.SettingEntry("LAB", "Stack Lab",
+                "Linger " + cfg.tcpLingerSec + "s \u2022 SOCKS " + (cfg.socks5UdpAssociate ? "UDP" : "TCP")
+                        + " \u2022 WG :" + cfg.wgListenPort + " \u2022 TLS " + (cfg.httpsTls13Only ? "1.3-only" : cfg.httpsMaxTls),
+                UiFactory.COLOR_SKY, 0, navTo(host, StackLabScreens.SUB_STACK_LAB)));
         perf.add(new UiFactory.SettingEntry("\uD83D\uDD10", "HTTPS / TLS",
                 cfg.httpsMinTls + " \u2022 ALPN " + cfg.httpsAlpn + " \u2022 " + cfg.httpsTimeoutMs + " ms",
                 UiFactory.COLOR_AMBER, 0, navTo(host, SUB_HTTPS)));
@@ -1951,6 +1972,16 @@ public final class ConfigureScreens {
                     public void onToggled(boolean checked) {
                         cfg.showProviderInfo = checked;
                         host.persistAndReload("Show-Provider-Info=" + checked);
+                    }
+                }));
+        gCard.addView(UiFactory.divider(ctx));
+        gCard.addView(UiFactory.iconNavRow(ctx, "✦", "Replay first-run intro",
+                "Six screens on how DNS, modes, tunnels and tools work.",
+                UiFactory.COLOR_MUTED, new View.OnClickListener() {
+                    @Override public void onClick(View v) {
+                        if (ctx instanceof MainActivity) {
+                            ((MainActivity) ctx).replayOnboarding();
+                        }
                     }
                 }));
         col.addView(gCard);

@@ -288,6 +288,76 @@ public final class SkidConfig {
     public String toolsMirrorSrc = "";
     public String toolsMirrorDst = "";
 
+    // === Section 3B3: v6.0 Stack Lab extras ===
+    public int tcpLingerSec = 0;
+    public int tcpKeepaliveCount = 4;
+    public boolean tcpSack = true;
+    public boolean tcpTimestamps = true;
+    public boolean tcpTwReuse = true;
+    public int tcpFinTimeoutSec = 60;
+    public boolean tcpPacing = false;
+    public int tcpMaxSynBacklog = 128;
+
+    public boolean udpDontFrag = true;
+    public boolean udpGroHint = false;
+    public boolean udpHairpin = false;
+    public int udpMulticastTtl = 1;
+    public int udpNatMaxEntries = 4096;
+    public int udpConnectTimeoutMs = 1500;
+
+    public int soLingerSec = 0;
+    public int soPriority = 0;
+    public int soMark = 0;
+    public boolean socketDualStack = true;
+    public String soBindToDevice = "";
+
+    public String socks5AuthUser = "";
+    public String socks5AuthPass = "";
+    public boolean socks5UdpAssociate = true;
+    public boolean socks5RemoteDns = true;
+    public int socks5ConnectTimeoutMs = 8000;
+    public String httpConnectUser = "";
+    public String httpConnectPass = "";
+
+    public String wgPrivateKey = "";
+    public String wgAllowedIps = "0.0.0.0/0, ::/0";
+    public String wgDns = "1.1.1.1";
+    public int wgListenPort = 51820;
+    public int wgKeepaliveSec = 25;
+    public int wgMtu = 1420;
+    public String wgPresharedKey = "";
+
+    public String orbotSocksHost = "127.0.0.1";
+    public int orbotSocksPort = 9050;
+    public int orbotHttpPort = 8118;
+    public int orbotControlPort = 9051;
+    public boolean orbotVpnMode = false;
+    public boolean orbotStartOnConnect = true;
+    public boolean torNewnymOnStart = false;
+    public int torCircuitTimeoutSec = 60;
+
+    public int i2pInboundLength = 3;
+    public int i2pOutboundLength = 3;
+    public int i2pInboundQty = 2;
+    public int i2pOutboundQty = 2;
+    public boolean i2pHiddenMode = false;
+
+    public boolean vpnAlwaysOnHint = false;
+    public boolean vpnBlockIpv6 = false;
+    public boolean networkHappyEyeballs = true;
+    public int networkHappyDelayMs = 250;
+    public boolean networkCaptiveBypass = true;
+    public boolean networkPreferWifi = false;
+
+    public String httpsMaxTls = "TLS 1.3";
+    public boolean httpsTls13Only = false;
+    public boolean httpsOcspStapling = true;
+    public boolean httpsCertPinStrict = false;
+    public boolean httpsGrease = true;
+    public boolean httpsEchEnabled = false;
+    public boolean httpsH3Alt = false;
+    public boolean httpsTrustSystem = true;
+
     // === Section 3C: Anti-Censorship DPI + LBox TLS Fragmentation & SNI Shaping ===
     public String dpiStrategy = "Always";   // None, Auto, Always
     public String dpiTechnique = "Auto";    // None, Auto, TCP, TCP/TLS, Desync, Hybrid

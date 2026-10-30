@@ -32,6 +32,7 @@ public final class SkidConfigStore {
 
     private static final String PREF_NAME = "skidwaredns_prefs";
     private static final String KEY_ACTIVE_SKID = "active_skid_raw";
+    private static final String KEY_ONBOARDING = "onboarding_v6_done";
     private static volatile SkidConfig activeCache;
 
     public static final List<PresetTemplate> BUILTIN_PRESETS;
@@ -1172,6 +1173,16 @@ public final class SkidConfigStore {
     }
 
     private SkidConfigStore() {}
+
+    public static boolean isOnboardingDone(Context ctx) {
+        if (ctx == null) return true;
+        return ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).getBoolean(KEY_ONBOARDING, false);
+    }
+
+    public static void setOnboardingDone(Context ctx, boolean done) {
+        if (ctx == null) return;
+        ctx.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().putBoolean(KEY_ONBOARDING, done).apply();
+    }
 
     public static synchronized SkidConfig getActive(Context ctx) {
         if (activeCache != null) {

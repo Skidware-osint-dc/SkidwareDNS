@@ -89,8 +89,14 @@ public final class SocketStack {
                 s.setTrafficClass(cfg.getTrafficClassByte());
                 if (cfg.tcpRstQuickClose) {
                     s.setSoLinger(true, 0);
-                } else if (cfg.tcpUserTimeoutMs > 0) {
-                    s.setSoLinger(true, Math.max(1, cfg.tcpUserTimeoutMs / 1000));
+                } else {
+                    int linger = cfg.tcpLingerSec > 0 ? cfg.tcpLingerSec
+                            : (cfg.soLingerSec > 0 ? cfg.soLingerSec : 0);
+                    if (linger > 0) {
+                        s.setSoLinger(true, linger);
+                    } else if (cfg.tcpUserTimeoutMs > 0) {
+                        s.setSoLinger(true, Math.max(1, cfg.tcpUserTimeoutMs / 1000));
+                    }
                 }
                 try {
                     s.setReuseAddress(cfg.tcpReuseAddress || cfg.soReusePort);
@@ -348,7 +354,8 @@ public final class SocketStack {
         sb.append(cfg.tcpNoDelay ? " NODELAY" : "");
         sb.append(cfg.tcpFastOpen ? " TFO" : "");
         sb.append(" buf ").append(cfg.socketBufferSizeKb).append("KB");
-        sb.append(" · TLS ").append(cfg.httpsMinTls);
+        sb.append(" · TLS ").append(cfg.httpsTls13Only ? "1.3-only" : cfg.httpsMinTls);
+        sb.append("..").append(cfg.httpsMaxTls);
         sb.append(" ALPN ").append(cfg.httpsAlpn);
         sb.append(" · ports ");
         if (cfg.portAllowList != null && !cfg.portAllowList.trim().isEmpty()) {
@@ -363,12 +370,18 @@ public final class SocketStack {
     }
 
     public static String[] enabledProtocols(SkidConfig cfg) {
-        String min = (cfg != null && cfg.httpsMinTls != null) ? cfg.httpsMinTls : "TLS 1.2";
-        String u = min.toUpperCase(Locale.US);
-        if (u.contains("1.3") && !u.contains("1.2")) {
+        if (cfg != null && cfg.httpsTls13Only) {
             return new String[]{"TLSv1.3"};
         }
-        if (u.contains("1.3")) {
+        String min = (cfg != null && cfg.httpsMinTls != null) ? cfg.httpsMinTls : "TLS 1.2";
+        String max = (cfg != null && cfg.httpsMaxTls != null) ? cfg.httpsMaxTls : "TLS 1.3";
+        String umin = min.toUpperCase(Locale.US);
+        String umax = max.toUpperCase(Locale.US);
+        boolean min13 = umin.contains("1.3") && !umin.contains("1.2");
+        if (min13) {
+            return new String[]{"TLSv1.3"};
+        }
+        if (umax.contains("1.3")) {
             return new String[]{"TLSv1.3", "TLSv1.2"};
         }
         return new String[]{"TLSv1.2"};

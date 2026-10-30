@@ -76,6 +76,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
     private final boolean[] includeSysAppsRef = new boolean[]{false};
     private final String[] appSearchQueryRef = new String[]{""};
 
+    private FrameLayout rootShell;
     private FrameLayout contentContainer;
     private TextView firewallBubbleBanner;
     private final List<LinearLayout> navPills = new ArrayList<>();
@@ -103,6 +104,15 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
 
     // Stats Live Refs
     private TextView statsGridSummaryTv;
+    private LiveChartView statsChart;
+    private TextView statsDnsTv;
+    private TextView statsBlkTv;
+    private TextView statsTcpTv;
+    private TextView statsUdpTv;
+    private TextView statsBytesTv;
+    private TextView statsRttTv;
+    private TextView statsModeTv;
+    private TextView statsBadgesTv;
 
     // .skid Studio Refs
     private EditText skidRawEditor;
@@ -251,7 +261,28 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         }
 
         root.addView(navBar);
-        setContentView(root);
+
+        rootShell = new FrameLayout(this);
+        rootShell.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        rootShell.addView(root, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setContentView(rootShell);
+        if (!SkidConfigStore.isOnboardingDone(this)) {
+            replayOnboarding();
+        }
+    }
+
+    public void replayOnboarding() {
+        if (rootShell == null) return;
+        View old = rootShell.findViewWithTag("skid-onboarding");
+        if (old != null) rootShell.removeView(old);
+        View overlay = OnboardingScreens.build(this, new OnboardingScreens.Done() {
+            @Override public void onFinished() {
+                SkidConfigStore.setOnboardingDone(MainActivity.this, true);
+            }
+        });
+        rootShell.addView(overlay);
     }
 
     private void switchTab(int idx) {
@@ -271,6 +302,15 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         contentContainer.removeAllViews();
         liveLogsListContainer = null;
         statsGridSummaryTv = null;
+        statsChart = null;
+        statsDnsTv = null;
+        statsBlkTv = null;
+        statsTcpTv = null;
+        statsUdpTv = null;
+        statsBytesTv = null;
+        statsRttTv = null;
+        statsModeTv = null;
+        statsBadgesTv = null;
 
         View page;
         switch (idx) {
@@ -766,6 +806,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         homeMiniLogs.setLayoutParams(mlLp);
         card.addView(homeMiniLogs);
         refreshHomeLive();
+        UiFactory.fadeIn(card, 0);
         return card;
     }
 
@@ -905,14 +946,87 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         int p = UiFactory.dp(this, 15);
         col.setPadding(p, p, p, p);
 
-        col.addView(UiFactory.label(this, "Live Network & Socket Stats", 20f, UiFactory.COLOR_TEXT, true, false));
-        col.addView(UiFactory.label(this, "Real-time TCP, UDP, DNS Booster, DPI Desync & PCAP telemetry", 12.5f, UiFactory.COLOR_MUTED, false, false));
+        col.addView(UiFactory.label(this, "Live Stats", 22f, UiFactory.COLOR_TEXT, true, false));
+        col.addView(UiFactory.label(this, "Allowed vs blocked, sockets, bytes and RTT — tap the chart",
+                12.5f, UiFactory.COLOR_MUTED, false, false));
 
-        LinearLayout card = UiFactory.card(this, UiFactory.COLOR_BORDER);
-        LinearLayout.LayoutParams cLp = (LinearLayout.LayoutParams) card.getLayoutParams();
-        cLp.topMargin = UiFactory.dp(this, 14);
-        statsGridSummaryTv = UiFactory.label(this, "", 13f, UiFactory.COLOR_TEXT, false, true);
-        card.addView(statsGridSummaryTv);
+        LinearLayout chartCard = UiFactory.card(this, UiFactory.COLOR_BORDER);
+        LinearLayout.LayoutParams chLp = (LinearLayout.LayoutParams) chartCard.getLayoutParams();
+        if (chLp != null) chLp.topMargin = UiFactory.dp(this, 14);
+        TextView liveCap = UiFactory.label(this, "TRAFFIC", 11.5f, UiFactory.COLOR_SKY, true, false);
+        liveCap.setLetterSpacing(0.08f);
+        chartCard.addView(liveCap);
+        statsChart = new LiveChartView(this, 148);
+        LinearLayout.LayoutParams chartLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, UiFactory.dp(this, 148));
+        chartLp.topMargin = UiFactory.dp(this, 8);
+        statsChart.setLayoutParams(chartLp);
+        statsChart.setSeriesTap(new LiveChartView.SeriesTap() {
+            @Override public void onSeries(boolean blocked) { showTrafficList(blocked); }
+        });
+        chartCard.addView(statsChart);
+        col.addView(chartCard);
+
+        LinearLayout row1 = new LinearLayout(this);
+        row1.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams rLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        rLp.topMargin = UiFactory.dp(this, 10);
+        row1.setLayoutParams(rLp);
+        LinearLayout dnsTile = UiFactory.statTile(this, "DNS OK", UiFactory.COLOR_SKY);
+        LinearLayout blkTile = UiFactory.statTile(this, "BLOCKED", UiFactory.COLOR_CRIMSON);
+        LinearLayout.LayoutParams dLp = (LinearLayout.LayoutParams) dnsTile.getLayoutParams();
+        dLp.rightMargin = UiFactory.dp(this, 8);
+        statsDnsTv = UiFactory.statTileValue(dnsTile);
+        statsBlkTv = UiFactory.statTileValue(blkTile);
+        row1.addView(dnsTile);
+        row1.addView(blkTile);
+        col.addView(row1);
+
+        LinearLayout row2 = new LinearLayout(this);
+        row2.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams r2Lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        r2Lp.topMargin = UiFactory.dp(this, 8);
+        row2.setLayoutParams(r2Lp);
+        LinearLayout tcpTile = UiFactory.statTile(this, "TCP", UiFactory.COLOR_EMERALD);
+        LinearLayout udpTile = UiFactory.statTile(this, "UDP", UiFactory.COLOR_AMBER);
+        LinearLayout.LayoutParams tLp = (LinearLayout.LayoutParams) tcpTile.getLayoutParams();
+        tLp.rightMargin = UiFactory.dp(this, 8);
+        statsTcpTv = UiFactory.statTileValue(tcpTile);
+        statsUdpTv = UiFactory.statTileValue(udpTile);
+        row2.addView(tcpTile);
+        row2.addView(udpTile);
+        col.addView(row2);
+
+        LinearLayout row3 = new LinearLayout(this);
+        row3.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams r3Lp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        r3Lp.topMargin = UiFactory.dp(this, 8);
+        row3.setLayoutParams(r3Lp);
+        LinearLayout bytTile = UiFactory.statTile(this, "BYTES", UiFactory.COLOR_PURPLE);
+        LinearLayout rttTile = UiFactory.statTile(this, "RTT", UiFactory.COLOR_SKY);
+        LinearLayout.LayoutParams bTileLp = (LinearLayout.LayoutParams) bytTile.getLayoutParams();
+        bTileLp.rightMargin = UiFactory.dp(this, 8);
+        statsBytesTv = UiFactory.statTileValue(bytTile);
+        statsRttTv = UiFactory.statTileValue(rttTile);
+        row3.addView(bytTile);
+        row3.addView(rttTile);
+        col.addView(row3);
+
+        LinearLayout modeCard = UiFactory.card(this, UiFactory.COLOR_BORDER);
+        LinearLayout.LayoutParams mLp = (LinearLayout.LayoutParams) modeCard.getLayoutParams();
+        if (mLp != null) mLp.topMargin = UiFactory.dp(this, 12);
+        statsModeTv = UiFactory.label(this, "", 14f, UiFactory.COLOR_TEXT, true, false);
+        statsBadgesTv = UiFactory.label(this, "", 12.5f, UiFactory.COLOR_MUTED, false, false);
+        LinearLayout.LayoutParams badgeLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        badgeLp.topMargin = UiFactory.dp(this, 4);
+        statsBadgesTv.setLayoutParams(badgeLp);
+        modeCard.addView(statsModeTv);
+        modeCard.addView(statsBadgesTv);
+        col.addView(modeCard);
 
         LinearLayout btnRow = new LinearLayout(this);
         btnRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -921,7 +1035,8 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         bLp.topMargin = UiFactory.dp(this, 12);
         btnRow.setLayoutParams(bLp);
 
-        Button flushBtn = UiFactory.actionButton(this, "Flush DNS Booster Cache", UiFactory.COLOR_SURFACE, UiFactory.COLOR_SKY, UiFactory.COLOR_BORDER);
+        Button flushBtn = UiFactory.actionButton(this, "Flush DNS cache", UiFactory.COLOR_SURFACE, UiFactory.COLOR_SKY, UiFactory.COLOR_BORDER);
+        flushBtn.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         flushBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -932,19 +1047,34 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         });
         View sp = new View(this);
         sp.setLayoutParams(new LinearLayout.LayoutParams(UiFactory.dp(this, 8), 1));
-        Button resetBtn = UiFactory.actionButton(this, "Reset Counters", UiFactory.COLOR_SURFACE, UiFactory.COLOR_CRIMSON, UiFactory.COLOR_BORDER);
+        Button resetBtn = UiFactory.actionButton(this, "Reset", UiFactory.COLOR_SURFACE, UiFactory.COLOR_CRIMSON, UiFactory.COLOR_BORDER);
+        resetBtn.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         resetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SkidEventBus.resetCounters();
                 refreshLiveViews();
+                UiFactory.pulseOnce(row1);
             }
         });
         btnRow.addView(flushBtn);
         btnRow.addView(sp);
         btnRow.addView(resetBtn);
-        card.addView(btnRow);
-        col.addView(card);
+        col.addView(btnRow);
+
+        LinearLayout dumpCard = UiFactory.card(this, UiFactory.COLOR_BORDER);
+        LinearLayout.LayoutParams dumpLp = (LinearLayout.LayoutParams) dumpCard.getLayoutParams();
+        if (dumpLp != null) dumpLp.topMargin = UiFactory.dp(this, 12);
+        dumpCard.addView(UiFactory.label(this, "DETAILS", 11.5f, UiFactory.COLOR_SKY, true, false));
+        statsGridSummaryTv = UiFactory.label(this, "", 12f, UiFactory.COLOR_MUTED, false, true);
+        dumpCard.addView(statsGridSummaryTv);
+        col.addView(dumpCard);
+
+        UiFactory.fadeIn(chartCard, 0);
+        UiFactory.fadeIn(row1, 40);
+        UiFactory.fadeIn(row2, 80);
+        UiFactory.fadeIn(row3, 120);
+        UiFactory.fadeIn(modeCard, 160);
 
         sv.addView(col);
         return sv;
@@ -1486,6 +1616,27 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
             }
         }
 
+        if (statsChart != null) statsChart.invalidate();
+        if (statsDnsTv != null) statsDnsTv.setText(String.valueOf(SkidEventBus.queriesResolved.get()));
+        if (statsBlkTv != null) statsBlkTv.setText(String.valueOf(SkidEventBus.threatsBlocked.get()));
+        if (statsTcpTv != null) statsTcpTv.setText(String.valueOf(SkidEventBus.tcpStreamsHandled.get()));
+        if (statsUdpTv != null) statsUdpTv.setText(String.valueOf(SkidEventBus.udpPacketsHandled.get()));
+        if (statsBytesTv != null) {
+            statsBytesTv.setText(SkidEventBus.formatBytes(SkidEventBus.bytesIn.get() + SkidEventBus.bytesOut.get()));
+        }
+        if (statsRttTv != null) statsRttTv.setText(SkidEventBus.lastLatencyMs.get() + " ms");
+        if (statsModeTv != null) {
+            statsModeTv.setText(config.mode + "  ·  " + config.name);
+        }
+        if (statsBadgesTv != null) {
+            statsBadgesTv.setText("SOCKS :" + config.getPrimaryLocalSocksPort()
+                    + (config.socks5UdpAssociate ? " UDP" : "")
+                    + "  ·  WG :" + config.wgListenPort + " ka " + config.wgKeepaliveSec + "s"
+                    + "  ·  Tor :" + config.orbotSocksPort
+                    + "  ·  TLS " + (config.httpsTls13Only ? "1.3-only" : config.httpsMinTls)
+                    + "  ·  linger " + config.tcpLingerSec + "s");
+        }
+
         if (statsGridSummaryTv != null) {
             long kbIn = SkidEventBus.bytesIn.get() / 1024L;
             long kbOut = SkidEventBus.bytesOut.get() / 1024L;
@@ -1508,7 +1659,10 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
                     "TCP Keepalive / TFO : Shorter=" + config.shorterTcpKeepalive + " | NoDelay=" + config.tcpNoDelay + " | TFO=" + config.tcpFastOpen + "\n" +
                     "TCP MSS / Idle      : " + config.tcpMssClamp + " B | Idle=" + (config.idleTimeoutSec == 0 ? "Disabled" : config.idleTimeoutSec + "s") + "\n" +
                     "UDP EIM / QUIC      : EIM=" + config.endpointIndependentMapping + " | QUIC=" + config.udpQuicPolicy + " | NAT=" + config.udpNatTimeoutSec + "s\n" +
-                    "Anti-Censorship DPI : Strategy=" + config.dpiStrategy + " | Technique=" + config.dpiTechnique + " (Split=" + config.tlsRecordSplitBytes + "B)";
+                    "Anti-Censorship DPI : Strategy=" + config.dpiStrategy + " | Technique=" + config.dpiTechnique + " (Split=" + config.tlsRecordSplitBytes + "B)\\n" +
+                    "Stack Lab           : Linger=" + config.tcpLingerSec + "s | SOCKS UDP=" + config.socks5UdpAssociate
+                    + " | WG :" + config.wgListenPort + " ka=" + config.wgKeepaliveSec
+                    + " | TLS13-only=" + config.httpsTls13Only + " | Orbot :" + config.orbotSocksPort;
             statsGridSummaryTv.setText(s);
         }
     }

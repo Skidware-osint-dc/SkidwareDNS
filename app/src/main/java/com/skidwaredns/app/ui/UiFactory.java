@@ -1,5 +1,7 @@
 package com.skidwaredns.app.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -884,5 +886,56 @@ public final class UiFactory {
             chip.setTextColor(COLOR_TEXT);
             chip.setBackground(roundedRect(ctx, COLOR_SURFACE, COLOR_BORDER, 1f, 20f));
         }
+    }
+
+    /** Two-line stats tile: muted caption + big accent value. Child 1 is the value TextView. */
+    public static LinearLayout statTile(Context ctx, String caption, int accent) {
+        LinearLayout tile = new LinearLayout(ctx);
+        tile.setOrientation(LinearLayout.VERTICAL);
+        int pad = dp(ctx, 12);
+        tile.setPadding(pad, pad, pad, pad);
+        tile.setBackground(cardFill(ctx, COLOR_BORDER, 16f));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        tile.setLayoutParams(lp);
+        TextView cap = label(ctx, caption, 11f, COLOR_MUTED, true, false);
+        cap.setLetterSpacing(0.06f);
+        TextView val = label(ctx, "0", 22f, accent, true, false);
+        LinearLayout.LayoutParams vLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        vLp.topMargin = dp(ctx, 6);
+        val.setLayoutParams(vLp);
+        tile.addView(cap);
+        tile.addView(val);
+        return tile;
+    }
+
+    public static TextView statTileValue(LinearLayout tile) {
+        if (tile == null || tile.getChildCount() < 2) return null;
+        View child = tile.getChildAt(1);
+        return (child instanceof TextView) ? (TextView) child : null;
+    }
+
+    public static void fadeIn(View v, int delayMs) {
+        if (v == null) return;
+        v.setAlpha(0f);
+        v.animate().alpha(1f).setDuration(280).setStartDelay(Math.max(0, delayMs)).setListener(null).start();
+    }
+
+    public static void staggerFade(ViewGroup parent, int startDelayMs) {
+        if (parent == null) return;
+        int n = parent.getChildCount();
+        for (int i = 0; i < n; i++) {
+            fadeIn(parent.getChildAt(i), startDelayMs + i * 40);
+        }
+    }
+
+    public static void pulseOnce(final View v) {
+        if (v == null) return;
+        v.animate().scaleX(1.06f).scaleY(1.06f).setDuration(140)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override public void onAnimationEnd(Animator animation) {
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(180).setListener(null).start();
+                    }
+                }).start();
     }
 }

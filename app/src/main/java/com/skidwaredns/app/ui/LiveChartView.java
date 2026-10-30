@@ -29,9 +29,15 @@ public final class LiveChartView extends View {
     private final Paint grid = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint axis = new Paint(Paint.ANTI_ALIAS_FLAG);
     private SeriesTap tap;
+    private final int heightDp;
 
     public LiveChartView(Context ctx) {
+        this(ctx, 112);
+    }
+
+    public LiveChartView(Context ctx, int heightDp) {
         super(ctx);
+        this.heightDp = heightDp > 0 ? heightDp : 112;
         allowLine.setStyle(Paint.Style.STROKE);
         allowLine.setStrokeWidth(UiFactory.dp(ctx, 1.8f));
         allowLine.setColor(UiFactory.COLOR_EMERALD);
@@ -54,7 +60,7 @@ public final class LiveChartView extends View {
     @Override
     protected void onMeasure(int wSpec, int hSpec) {
         int w = MeasureSpec.getSize(wSpec);
-        int h = UiFactory.dp(getContext(), 112);
+        int h = UiFactory.dp(getContext(), heightDp);
         setMeasuredDimension(w, h);
     }
 
