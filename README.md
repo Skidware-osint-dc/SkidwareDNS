@@ -1,6 +1,6 @@
 # SkidwareDNS
 
-**v6.0.0-skid** · `versionCode 600` · Android 7+ (API 24) · target SDK 34
+**v6.0.0-skid** · `versionCode 600` · Android 7+ (API 24) · target SDK 34 · [GPL-3.0-or-later](./LICENSE)
 
 A local Android VPN, encrypted DNS router, firewall, and tunnel forge in **one APK**. Traffic stays on the device unless you turn on a tunnel. Profiles are plain-text **`.skid`** files you can export, share, and re-import.
 
@@ -322,4 +322,15 @@ LBox templates, DNSCrypt + Tor + Purple I2P, MegaProxy, Lumine Fake-IP, Hysteria
 
 ## License
 
-No SPDX license file is attached. Treat the tree as source-available unless the repository owner adds one. Third-party inspiration (Tools hub) was reimplemented; do not copy GPLv3 sources into this APK. JSch 0.1.55 is the jcraft BSD-style JAR under `app/libs/`.
+[GNU General Public License v3.0 or later](./LICENSE)
+
+Copyright (C) 2026 Skidware-osint-dc
+
+SkidwareDNS is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the [GNU General Public License](./LICENSE) for more details.
+
+**Third-party notes**
+
+- Tools hub screens (FTP, LAN scan, SSH, knock, port-check, mirror) were reimplemented in Java. They are not copies of those projects.
+- JSch 0.1.55 (`app/libs/jsch-0.1.55.jar`) remains under the jcraft BSD-style license. GPL-3.0 can combine with that JAR; do not replace it with a GPL-incompatible SSH library.
