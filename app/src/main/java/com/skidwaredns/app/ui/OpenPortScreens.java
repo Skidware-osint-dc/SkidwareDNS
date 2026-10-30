@@ -18,7 +18,7 @@ import com.skidwaredns.app.proxy.PortCatalog;
 import java.util.List;
 
 /**
- * Open Port menu: bind 1–10000 on this device's IP, plus a catalog of what
+ * Open Port menu: bind 1-64000 on this device's IP, plus a catalog of what
  * each port is for. Java 8, no lambdas.
  */
 public final class OpenPortScreens {
@@ -43,7 +43,7 @@ public final class OpenPortScreens {
         OpenPortEngine.get().applyConfig(cfg);
 
         col.addView(UiFactory.backHeader(ctx, "Open Port",
-                "Bind a port on this device and read what 1–10000 are for",
+                "Bind a port on this device and read what 1-64000 are for",
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -146,7 +146,7 @@ public final class OpenPortScreens {
 
         LinearLayout goRow = new LinearLayout(ctx);
         goRow.setOrientation(LinearLayout.HORIZONTAL);
-        final EditText portEt = UiFactory.monoInput(ctx, String.valueOf(selectedPort), "1–10000", false);
+        final EditText portEt = UiFactory.monoInput(ctx, String.valueOf(selectedPort), "1-64000", false);
         LinearLayout.LayoutParams etLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
         portEt.setLayoutParams(etLp);
         Button jump = UiFactory.actionButton(ctx, "Go",
@@ -156,13 +156,13 @@ public final class OpenPortScreens {
             public void onClick(View v) {
                 try {
                     int p = Integer.parseInt(portEt.getText().toString().trim());
-                    if (p < 1 || p > 10000) throw new NumberFormatException();
+                    if (p < PortCatalog.MIN || p > PortCatalog.MAX) throw new NumberFormatException();
                     selectedPort = p;
                     pageStart = ((p - 1) / PAGE_SIZE) * PAGE_SIZE + 1;
                     searchQ = "";
                     host.openConfigureSubScreen(SUB_OPEN_PORT);
                 } catch (Exception e) {
-                    Toast.makeText(ctx, "Enter a port 1–10000", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, "Enter a port 1-64000", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -228,7 +228,7 @@ public final class OpenPortScreens {
         col.addView(det);
 
         // ---- Catalog search + page ------------------------------------
-        col.addView(UiFactory.categoryTitle(ctx, "Catalog  1–10000  ·  " + PortCatalog.namedCount() + " named IANA services"));
+        col.addView(UiFactory.categoryTitle(ctx, "Catalog  1-64000  ·  " + PortCatalog.namedCount() + " named (IANA + IpCisco + Wikipedia)"));
         LinearLayout cat = UiFactory.card(ctx, UiFactory.COLOR_BORDER);
         final EditText searchEt = UiFactory.monoInput(ctx, searchQ, "Search name, number, or what it does", false);
         searchEt.addTextChangedListener(new TextWatcher() {
@@ -253,10 +253,10 @@ public final class OpenPortScreens {
 
         LinearLayout rangeRow = new LinearLayout(ctx);
         rangeRow.setOrientation(LinearLayout.HORIZONTAL);
-        addRangeChip(ctx, host, rangeRow, "1–1023", 1);
+        addRangeChip(ctx, host, rangeRow, "1-1023", 1);
         addRangeChip(ctx, host, rangeRow, "1024+", 1024);
-        addRangeChip(ctx, host, rangeRow, "8000s", 8000);
-        addRangeChip(ctx, host, rangeRow, "9000s", 9000);
+        addRangeChip(ctx, host, rangeRow, "10k", 10000);
+        addRangeChip(ctx, host, rangeRow, "WG 51820", 51820);
         cat.addView(rangeRow);
 
         boolean searching = searchQ != null && searchQ.trim().length() > 0;
@@ -267,10 +267,11 @@ public final class OpenPortScreens {
                     12f, UiFactory.COLOR_MUTED, false, false));
         } else {
             if (pageStart < 1) pageStart = 1;
-            if (pageStart > 10000) pageStart = 9951;
+            int lastPage = ((PortCatalog.MAX - 1) / PAGE_SIZE) * PAGE_SIZE + 1;
+            if (pageStart > PortCatalog.MAX) pageStart = lastPage;
             rows = PortCatalog.page(pageStart, PAGE_SIZE);
-            int end = Math.min(10000, pageStart + PAGE_SIZE - 1);
-            cat.addView(UiFactory.label(ctx, "Showing " + pageStart + "–" + end + " of 10000",
+            int end = Math.min(PortCatalog.MAX, pageStart + PAGE_SIZE - 1);
+            cat.addView(UiFactory.label(ctx, "Showing " + pageStart + "-" + end + " of " + PortCatalog.MAX,
                     12f, UiFactory.COLOR_MUTED, false, false));
         }
 
@@ -308,7 +309,8 @@ public final class OpenPortScreens {
             next.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    pageStart = Math.min(9951, pageStart + PAGE_SIZE);
+                    int lastPage = ((PortCatalog.MAX - 1) / PAGE_SIZE) * PAGE_SIZE + 1;
+                    pageStart = Math.min(lastPage, pageStart + PAGE_SIZE);
                     host.openConfigureSubScreen(SUB_OPEN_PORT);
                 }
             });

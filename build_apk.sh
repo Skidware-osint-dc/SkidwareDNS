@@ -27,8 +27,8 @@ aapt2 link \
   --java "$WORK_DIR/gen" \
   --min-sdk-version 24 \
   --target-sdk-version 34 \
-  --version-code 550 \
-  --version-name "5.5.0-skid" \
+  --version-code 560 \
+  --version-name "5.6.0-skid" \
   -o "$WORK_DIR/apk/unsigned_unaligned.apk" \
   "$WORK_DIR/compiled_res/res.zip"
 

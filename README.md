@@ -1,6 +1,8 @@
-# SkidwareDNS v5.5 ("Open Port") — `5.5.0-skid` (`versionCode 550`)
+# SkidwareDNS v5.6 ("Open Port 1-64000") — `5.6.0-skid` (`versionCode 560`)
 
-**Open Port** binds TCP/UDP **1–10000** on this device's LAN IP, with a catalog of what each port is for (543 named IANA services; every other port still has an honest unassigned / well-known note). Not a proxy: accepted clients get a banner, then the socket closes.
+**Open Port** binds TCP/UDP **1-64000** on this device's LAN IP. The catalog names 6000+ services from [IANA](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml), [IpCisco well-known/registered tables](https://ipcisco.com/lesson/network-ports/), and [Wikipedia's TCP/UDP port list](https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers). Every other port still gets an RFC 6335 range note (well-known 1-1023 / registered 1024-49151 / dynamic 49152-64000). Not a proxy: accepted clients get a banner, then the socket closes.
+
+Jump chips include **WG 51820** (WireGuard). Search Minecraft `25565`, MongoDB `27017`, PGP `11371`, traceroute `33434`.
 
 Configure → **Open Port**, or Ports → **Open Port on this device**. Bind **Device-IP** / `0.0.0.0` / loopback. Opened ports persist in `.skid` as `OPEN LISTEN PORTS []` and restore when the VPN engine starts.
 
@@ -222,7 +224,7 @@ The tool count grew to 25 screens across five vendors; v5.2 reorganises them ins
 
 ```bash
 ./build_apk.sh
-# Outputs v5.5 (550 / 5.5.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
+# Outputs v5.6 (560 / 5.6.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
 
 # Host-JVM verification + .skid preset export (81 checks)
 java -cp <classes> VerifySkidV51 /home/user/SkidwareDNS/configs

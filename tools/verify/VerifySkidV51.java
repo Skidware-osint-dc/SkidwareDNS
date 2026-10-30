@@ -163,19 +163,27 @@ public final class VerifySkidV51 {
         check(oldSer.contains("TCP-NoDelay=false") && oldSer.contains("HTTPS-MinTLS="),
                 "legacy serialize keeps old keys and adds v5.4 keys");
 
-        System.out.println("== 5. v5.5 Open Port catalog 1–10000 ==");
+        System.out.println("== 5. Open Port catalog 1-64000 (IANA + IpCisco + Wikipedia) ==");
         PortCatalog.Info http = PortCatalog.lookup(80);
-        check("HTTP".equals(http.name) && http.assigned, "port 80 is HTTP");
-        check(PortCatalog.lookup(22).name.contains("SSH"), "port 22 is SSH");
-        check(PortCatalog.lookup(443).name.contains("HTTPS"), "port 443 is HTTPS");
-        check(PortCatalog.lookup(53).name.contains("DNS"), "port 53 is DNS");
+        check(http.assigned && http.name.toLowerCase().contains("http"), "port 80 is HTTP");
+        check(PortCatalog.lookup(22).name.toLowerCase().contains("ssh"), "port 22 is SSH");
+        check(PortCatalog.lookup(443).name.toLowerCase().contains("https"), "port 443 is HTTPS");
+        check(PortCatalog.lookup(53).name.toLowerCase().contains("domain")
+                || PortCatalog.lookup(53).name.toLowerCase().contains("dns"), "port 53 is DNS");
         check(PortCatalog.page(1, 50).size() == 50, "page size 50");
-        check(PortCatalog.page(9951, 50).size() == 50, "last page 9951–10000");
+        check(PortCatalog.page(63951, 50).size() == 50, "last page 63951-64000");
         check(PortCatalog.search("ssh", 10).size() > 0, "search ssh");
         check(PortCatalog.search("8080", 5).get(0).port == 8080, "search 8080");
-        check(!PortCatalog.lookup(4242).about.isEmpty(), "unassigned 4242 still has a description");
+        check(!PortCatalog.lookup(4242).about.isEmpty(), "port 4242 still has a description");
         check(PortCatalog.lookup(0).name.contains("Out of range"), "port 0 out of range");
-        check(PortCatalog.lookup(10001).name.contains("Out of range"), "port 10001 out of range");
+        check(PortCatalog.lookup(64001).name.contains("Out of range"), "port 64001 out of range");
+        check(PortCatalog.lookup(64000).port == 64000, "port 64000 in range");
+        check(PortCatalog.namedCount() > 5000, "named catalog > 5000 (got " + PortCatalog.namedCount() + ")");
+        check(PortCatalog.lookup(51820).name.toLowerCase().contains("wireguard"), "51820 WireGuard");
+        check(PortCatalog.lookup(25565).name.toLowerCase().contains("minecraft"), "25565 Minecraft (IpCisco)");
+        check(PortCatalog.lookup(27017).name.toLowerCase().contains("mongo"), "27017 MongoDB (IpCisco)");
+        check(PortCatalog.lookup(11371).name.toLowerCase().contains("pgp"), "11371 PGP keyserver (IpCisco)");
+        check(PortCatalog.MAX == 64000, "MAX=64000");
         SkidConfig op = new SkidConfig();
         op.openListenPorts.add("8080/tcp");
         op.openPortBindMode = "0.0.0.0";

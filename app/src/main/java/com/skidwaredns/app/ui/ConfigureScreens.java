@@ -135,7 +135,7 @@ public final class ConfigureScreens {
         headLeft.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         headLeft.addView(UiFactory.label(ctx, "Configure", 22f, UiFactory.COLOR_TEXT, true, false));
         headLeft.addView(UiFactory.label(ctx, "Every tool, one place \u2022 search or drill in", 12f, UiFactory.COLOR_MUTED, false, false));
-        TextView verChip = UiFactory.counterChip(ctx, "v5.5", UiFactory.COLOR_SKY);
+        TextView verChip = UiFactory.counterChip(ctx, "v5.6", UiFactory.COLOR_SKY);
         LinearLayout headRight = new LinearLayout(ctx);
         headRight.setOrientation(LinearLayout.HORIZONTAL);
         headRight.setGravity(Gravity.CENTER_VERTICAL);
@@ -326,7 +326,7 @@ public final class ConfigureScreens {
                 "block " + cfg.portBlockList + " \u2022 SOCKS :" + cfg.getPrimaryLocalSocksPort(),
                 UiFactory.COLOR_AMBER, 0, navTo(host, SUB_PORTS)));
         perf.add(new UiFactory.SettingEntry("PORT", "Open Port",
-                OpenPortEngine.get().list().size() + " listening \u2022 catalog 1–10000 \u2022 "
+                OpenPortEngine.get().list().size() + " listening \u2022 catalog 1-64000 \u2022 "
                         + OpenPortEngine.primaryDeviceIpv4(),
                 UiFactory.COLOR_AMBER, 0, navTo(host, OpenPortScreens.SUB_OPEN_PORT)));
         addSection(ctx, host, holder, "\u26A1", "Performance & Sockets",
@@ -2488,7 +2488,7 @@ public final class ConfigureScreens {
         col.addView(UiFactory.categoryTitle(ctx, "Open a port"));
         LinearLayout openCard = UiFactory.card(ctx, UiFactory.COLOR_SKY);
         openCard.addView(UiFactory.iconNavRow(ctx, "PORT", "Open Port on this device",
-                OpenPortEngine.describeBind(cfg) + " \u2022 catalog of ports 1–10000",
+                OpenPortEngine.describeBind(cfg) + " \u2022 catalog of ports 1-64000",
                 UiFactory.COLOR_SKY, navTo(host, OpenPortScreens.SUB_OPEN_PORT)));
         col.addView(openCard);
 

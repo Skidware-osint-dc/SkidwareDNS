@@ -100,7 +100,7 @@ public final class OpenPortEngine {
     public synchronized String open(SkidConfig c, int port, boolean tcp, boolean udp) {
         applyConfig(c);
         if (port < PortCatalog.MIN || port > PortCatalog.MAX) {
-            return "Port must be 1–10000.";
+            return "Port must be 1-64000.";
         }
         if (!tcp && !udp) return "Pick TCP, UDP, or both.";
         if (sessions.containsKey(Integer.valueOf(port))) {
