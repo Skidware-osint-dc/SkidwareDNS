@@ -10,14 +10,19 @@ SDK_ROOT="${ANDROID_SDK_ROOT:-/opt/android-sdk}"
 BUILD_TOOLS="$SDK_ROOT/build-tools/34.0.0"
 PLATFORM_JAR="$SDK_ROOT/platforms/android-34/android.jar"
 
-if [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/javac" ]; then
-  JAVAC_BIN="$JAVA_HOME/bin/javac"
+# d8 8.2 NPEs on anonymous classes ($1.class) produced by JDK 21 javac -source 8.
+# Compile with JDK 11; keep JAVA_HOME (21) on PATH for apksigner.
+if [ -n "${JAVA_HOME_11_X64:-}" ] && [ -x "${JAVA_HOME_11_X64}/bin/javac" ]; then
+  JAVAC_BIN="${JAVA_HOME_11_X64}/bin/javac"
 elif [ -x /usr/lib/jvm/jdk-11/bin/javac ]; then
   JAVAC_BIN=/usr/lib/jvm/jdk-11/bin/javac
+elif [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/javac" ]; then
+  JAVAC_BIN="$JAVA_HOME/bin/javac"
 else
   JAVAC_BIN="$(command -v javac)"
 fi
 export PATH="${JAVA_HOME:-}/bin:$BUILD_TOOLS:$PATH"
+echo "javac: $JAVAC_BIN"
 
 VERSION_CODE="${SKID_VERSION_CODE:-601}"
 VERSION_NAME="${SKID_VERSION_NAME:-6.0.1-skid}"
