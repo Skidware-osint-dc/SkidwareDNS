@@ -27,18 +27,19 @@ aapt2 link \
   --java "$WORK_DIR/gen" \
   --min-sdk-version 24 \
   --target-sdk-version 34 \
-  --version-code 560 \
-  --version-name "5.6.0-skid" \
+  --version-code 570 \
+  --version-name "5.7.0-skid" \
   -o "$WORK_DIR/apk/unsigned_unaligned.apk" \
   "$WORK_DIR/compiled_res/res.zip"
 
 echo "[3/6] Compiling Java source files against Android API 34..."
+JSCH_JAR="$PROJECT_DIR/app/libs/jsch-0.1.55.jar"
 find "$PROJECT_DIR/app/src/main/java" "$WORK_DIR/gen" -name "*.java" > "$WORK_DIR/sources.txt"
 "$JAVAC_BIN" \
   -source 8 -target 8 \
   -bootclasspath "$PLATFORM_JAR" \
   -encoding UTF-8 \
-  -classpath "$PLATFORM_JAR" \
+  -classpath "$PLATFORM_JAR:$JSCH_JAR" \
   -d "$WORK_DIR/classes" \
   @"$WORK_DIR/sources.txt"
 
@@ -49,7 +50,8 @@ d8 \
   --min-api 24 \
   --lib "$PLATFORM_JAR" \
   --output "$WORK_DIR/dex" \
-  "$WORK_DIR/app_classes.jar"
+  "$WORK_DIR/app_classes.jar" \
+  "$JSCH_JAR"
 
 (cd "$WORK_DIR/dex" && zip -q "$WORK_DIR/apk/unsigned_unaligned.apk" classes*.dex)
 

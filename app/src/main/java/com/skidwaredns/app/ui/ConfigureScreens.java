@@ -22,6 +22,8 @@ import android.widget.Toast;
 import com.skidwaredns.app.config.SkidConfig;
 import com.skidwaredns.app.dns.DnsUpstreamResolver;
 import com.skidwaredns.app.proxy.OpenPortEngine;
+import com.skidwaredns.app.tools.FtpsServerEngine;
+import com.skidwaredns.app.tools.LanScannerEngine;
 import com.skidwaredns.app.firewall.SkidFirewallEngine;
 import com.skidwaredns.app.model.DnsPresets;
 import com.skidwaredns.app.tunnel.TunnelEngine;
@@ -78,6 +80,14 @@ public final class ConfigureScreens {
             case SUB_HTTPS: return buildHttpsScreen(ctx, host);
             case SUB_PORTS: return buildPortsScreen(ctx, host);
             case OpenPortScreens.SUB_OPEN_PORT: return OpenPortScreens.build(ctx, host);
+            case ToolScreens.SUB_TOOLS_HUB:
+            case ToolScreens.SUB_FTPS:
+            case ToolScreens.SUB_SCANNER:
+            case ToolScreens.SUB_SHELLWAVE:
+            case ToolScreens.SUB_KNOCK:
+            case ToolScreens.SUB_PORTCHECK:
+            case ToolScreens.SUB_MIRROR:
+                return ToolScreens.build(ctx, subId, host);
             case SUB_ANTICENSORSHIP: return buildAntiCensorshipScreen(ctx, host);
             case SUB_NETWORK: return buildNetworkScreen(ctx, host);
             case SUB_GENERAL: return buildGeneralSettingsScreen(ctx, host);
@@ -135,7 +145,7 @@ public final class ConfigureScreens {
         headLeft.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         headLeft.addView(UiFactory.label(ctx, "Configure", 22f, UiFactory.COLOR_TEXT, true, false));
         headLeft.addView(UiFactory.label(ctx, "Every tool, one place \u2022 search or drill in", 12f, UiFactory.COLOR_MUTED, false, false));
-        TextView verChip = UiFactory.counterChip(ctx, "v5.6", UiFactory.COLOR_SKY);
+        TextView verChip = UiFactory.counterChip(ctx, "v5.7", UiFactory.COLOR_SKY);
         LinearLayout headRight = new LinearLayout(ctx);
         headRight.setOrientation(LinearLayout.HORIZONTAL);
         headRight.setGravity(Gravity.CENTER_VERTICAL);
@@ -176,6 +186,17 @@ public final class ConfigureScreens {
                         privacyStackBadge(cfg), "DNSCrypt / Tor / I2P",
                         UiFactory.COLOR_PURPLE, navTo(host, InviZibleModuleScreens.SUB_DNSCRYPT_SETTINGS)));
         col.addView(tileRow2);
+
+        LinearLayout tileRow3 = UiFactory.taskTileRow(ctx,
+                UiFactory.taskTile(ctx, "\uD83D\uDEE0", "TOOLS",
+                        "FTP · scan · SSH · knock · check · mirror",
+                        "Open tools hub",
+                        UiFactory.COLOR_AMBER, navTo(host, ToolScreens.SUB_TOOLS_HUB)),
+                UiFactory.taskTile(ctx, "#", "OPEN PORT",
+                        OpenPortEngine.get().list().size() + " listening · 1-64000",
+                        "Bind on this device",
+                        UiFactory.COLOR_AMBER, navTo(host, OpenPortScreens.SUB_OPEN_PORT)));
+        col.addView(tileRow3);
 
         // ---- Search ------------------------------------------------------
         final LinearLayout sectionsHolder = new LinearLayout(ctx);
@@ -331,6 +352,31 @@ public final class ConfigureScreens {
                 UiFactory.COLOR_AMBER, 0, navTo(host, OpenPortScreens.SUB_OPEN_PORT)));
         addSection(ctx, host, holder, "\u26A1", "Performance & Sockets",
                 "Buffers, TLS, NAT, MSS and port policy", UiFactory.COLOR_AMBER, perf, query, false);
+
+        // ================= 5b. TOOLS HUB ===========================
+        List<UiFactory.SettingEntry> tools = new ArrayList<>();
+        tools.add(new UiFactory.SettingEntry("\uD83D\uDEE0", "Tools hub",
+                "FTPS, LAN scan, SSH, knock, port-check, mirror",
+                UiFactory.COLOR_AMBER, 0, navTo(host, ToolScreens.SUB_TOOLS_HUB)));
+        tools.add(new UiFactory.SettingEntry("FTP", "FTPS / file share",
+                FtpsServerEngine.get().isRunning() ? FtpsServerEngine.get().status()
+                        : "FTP :" + cfg.toolsFtpsPort,
+                UiFactory.COLOR_AMBER, 0, navTo(host, ToolScreens.SUB_FTPS)));
+        tools.add(new UiFactory.SettingEntry("RADAR", "Network scanner",
+                LanScannerEngine.get().summary(),
+                UiFactory.COLOR_AMBER, 0, navTo(host, ToolScreens.SUB_SCANNER)));
+        tools.add(new UiFactory.SettingEntry("SSH", "Shellwave SSH",
+                cfg.toolsSshUser + "@" + cfg.toolsSshHost + ":" + cfg.toolsSshPort,
+                UiFactory.COLOR_AMBER, 0, navTo(host, ToolScreens.SUB_SHELLWAVE)));
+        tools.add(new UiFactory.SettingEntry("#", "Knock on Ports",
+                cfg.toolsKnockSequence, UiFactory.COLOR_AMBER, 0, navTo(host, ToolScreens.SUB_KNOCK)));
+        tools.add(new UiFactory.SettingEntry("TARGET", "Port checker",
+                cfg.toolsCheckHost + " " + cfg.toolsCheckFrom + "-" + cfg.toolsCheckTo,
+                UiFactory.COLOR_AMBER, 0, navTo(host, ToolScreens.SUB_PORTCHECK)));
+        tools.add(new UiFactory.SettingEntry("COPY", "Folder mirror",
+                cfg.toolsMirrorDst, UiFactory.COLOR_AMBER, 0, navTo(host, ToolScreens.SUB_MIRROR)));
+        addSection(ctx, host, holder, "\uD83D\uDEE0", "Tools",
+                "Share, scan, SSH, knock and copy on this LAN", UiFactory.COLOR_AMBER, tools, query, false);
 
         // ================= 6. APP & DIAGNOSTICS ====================
         List<UiFactory.SettingEntry> app = new ArrayList<>();

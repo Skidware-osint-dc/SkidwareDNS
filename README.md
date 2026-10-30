@@ -1,3 +1,20 @@
+# SkidwareDNS v5.7 ("Tools hub") — `5.7.0-skid` (`versionCode 570`)
+
+Configure → **Tools** (or the Tools tile on the hub) folds six LAN utilities into this APK, reimplemented in Java — not a copy of those projects:
+
+| Screen | Inspired by | What it does here |
+| --- | --- | --- |
+| **FTPS / file share** | [drweb86/dotnet-ftps-server](https://github.com/drweb86/dotnet-ftps-server) | Password FTP on :2121 (PASV, UTF-8). TLS/AUTH not bundled. |
+| **Network scanner** | [usamaiqb/network-scanner](https://github.com/usamaiqb/network-scanner) | This /24 TCP sweep + mDNS + SSDP. No root. |
+| **Shellwave SSH** | [LordOfPolls/Shellwave](https://github.com/LordOfPolls/Shellwave) | Banner, password exec, SFTP ls (JSch). Not a full terminal. |
+| **Knock on Ports** | [impalex/knockonports](https://github.com/impalex/knockonports) | TCP/UDP knockd sequences with delay. ICMP skipped (needs root). |
+| **Port checker** | [CodeDead/Advanced-PortChecker-android](https://github.com/CodeDead/Advanced-PortChecker-android) | TCP/UDP range on one host (max 4096). Catalog names attached. |
+| **Folder mirror** | [He11PC/android-mirror](https://github.com/He11PC/android-mirror) | One-way copy: local, `ftp://`, `sftp:`, `http://`. No SMB/NFS. |
+
+Settings persist in `.skid` as `Tools-*` keys. Only scan/knock/check hosts you own.
+
+---
+
 # SkidwareDNS v5.6 ("Open Port 1-64000") — `5.6.0-skid` (`versionCode 560`)
 
 **Open Port** binds TCP/UDP **1-64000** on this device's LAN IP. The catalog names 6000+ services from [IANA](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml), [IpCisco well-known/registered tables](https://ipcisco.com/lesson/network-ports/), and [Wikipedia's TCP/UDP port list](https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers). Every other port still gets an RFC 6335 range note (well-known 1-1023 / registered 1024-49151 / dynamic 49152-64000). Not a proxy: accepted clients get a banner, then the socket closes.
@@ -224,7 +241,7 @@ The tool count grew to 25 screens across five vendors; v5.2 reorganises them ins
 
 ```bash
 ./build_apk.sh
-# Outputs v5.6 (560 / 5.6.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
+# Outputs v5.7 (570 / 5.7.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
 
 # Host-JVM verification + .skid preset export (81 checks)
 java -cp <classes> VerifySkidV51 /home/user/SkidwareDNS/configs

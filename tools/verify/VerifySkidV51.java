@@ -195,6 +195,30 @@ public final class VerifySkidV51 {
         check(op2.openPortHold, "Open-Port-Hold round-trip");
         check(op2.openPortBanner, "Open-Port-Banner default true");
 
+        System.out.println("== 6. v5.7 Tools hub parsers ==");
+        java.util.List<com.skidwaredns.app.tools.ToolNet.KnockStep> kn =
+                com.skidwaredns.app.tools.ToolNet.parseKnock("7000,8000/udp,9000/tcp", "TCP", null);
+        check(kn.size() == 3, "knock 3 steps");
+        check(kn.get(0).port == 7000 && "TCP".equals(kn.get(0).proto), "knock 7000 TCP");
+        check(kn.get(1).port == 8000 && "UDP".equals(kn.get(1).proto), "knock 8000 UDP");
+        check(kn.get(2).port == 9000 && "TCP".equals(kn.get(2).proto), "knock 9000 TCP");
+        java.util.List<Integer> ports = com.skidwaredns.app.tools.ToolNet.parsePorts("22,80-82");
+        check(ports.size() == 4 && ports.get(0) == 22 && ports.get(3) == 82, "port list 22,80-82");
+        check(com.skidwaredns.app.tools.ToolNet.lanPrefix24("192.168.1.50").equals("192.168.1"), "slash24 prefix");
+        check(com.skidwaredns.app.tools.ToolNet.clampPort(0, 22) == 22, "clamp 0 -> 22");
+        check(com.skidwaredns.app.ui.ToolScreens.SUB_TOOLS_HUB == 40, "tools hub id 40");
+        check(com.skidwaredns.app.ui.ToolScreens.SUB_MIRROR == 46, "mirror id 46");
+        SkidConfig tools = new SkidConfig();
+        tools.toolsFtpsPort = 2121;
+        tools.toolsSshHost = "192.168.1.2";
+        tools.toolsKnockSequence = "7000,8000/udp";
+        String tSer = SkidConfigParser.serialize(tools);
+        SkidConfig tools2 = SkidConfigParser.parse(tSer).config;
+        check(tools2.toolsFtpsPort == 2121, "Tools-Ftps-Port round-trip");
+        check("192.168.1.2".equals(tools2.toolsSshHost), "Tools-Ssh-Host round-trip");
+        check("7000,8000/udp".equals(tools2.toolsKnockSequence), "Tools-Knock-Sequence round-trip");
+        check("skid".equals(tools2.toolsFtpsUser), "Tools-Ftps-User default");
+
         System.out.println();
         System.out.println(failures == 0 ? "PASS: VerifySkidV51 (" + checks + " checks)"
                 : "FAIL: " + failures + "/" + checks + " checks");

@@ -267,6 +267,27 @@ public final class SkidConfig {
     public boolean openPortBanner = true;
     public boolean openPortHold = false;
 
+    // v5.7 Tools hub (FTPS, LAN scan, SSH, knock, port-check, mirror)
+    public int toolsFtpsPort = 2121;
+    public String toolsFtpsUser = "skid";
+    public String toolsFtpsPass = "skid";
+    public String toolsScanPorts = "22,80,443,445,3389,8080,8443";
+    public String toolsCheckHost = "127.0.0.1";
+    public int toolsCheckFrom = 1;
+    public int toolsCheckTo = 1024;
+    public String toolsCheckProto = "TCP";
+    public String toolsKnockHost = "";
+    public String toolsKnockSequence = "7000,8000,9000";
+    public String toolsKnockProto = "TCP";
+    public int toolsKnockDelayMs = 200;
+    public String toolsSshHost = "";
+    public int toolsSshPort = 22;
+    public String toolsSshUser = "root";
+    public String toolsSshPass = "";
+    public String toolsSshCommand = "uname -a";
+    public String toolsMirrorSrc = "";
+    public String toolsMirrorDst = "";
+
     // === Section 3C: Anti-Censorship DPI + LBox TLS Fragmentation & SNI Shaping ===
     public String dpiStrategy = "Always";   // None, Auto, Always
     public String dpiTechnique = "Auto";    // None, Auto, TCP, TCP/TLS, Desync, Hybrid
