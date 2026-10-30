@@ -219,6 +219,23 @@ public final class VerifySkidV51 {
         check("7000,8000/udp".equals(tools2.toolsKnockSequence), "Tools-Knock-Sequence round-trip");
         check("skid".equals(tools2.toolsFtpsUser), "Tools-Ftps-User default");
 
+        System.out.println("== 7. v5.9 operating modes + traffic format ==");
+        check(com.skidwaredns.app.model.OperatingModes.NAMES.length == 15, "15 operating modes");
+        check(!com.skidwaredns.app.model.OperatingModes.usesVpnTun("Proxy-Only"), "Proxy-Only no tun");
+        check(!com.skidwaredns.app.model.OperatingModes.usesVpnTun("LAN-Tools"), "LAN-Tools no tun");
+        check(com.skidwaredns.app.model.OperatingModes.usesDefaultRoute("Lockdown"), "Lockdown default route");
+        check(com.skidwaredns.app.model.OperatingModes.usesDefaultRoute("WireGuard-VPN"), "WG default route");
+        check(!com.skidwaredns.app.model.OperatingModes.usesDefaultRoute("DNS+Firewall"), "DNS+Firewall no default route");
+        SkidConfig md = new SkidConfig();
+        com.skidwaredns.app.model.OperatingModes.apply(md, "Tor+DNSCrypt+VPN");
+        check(md.torEnabled && "DNSCrypt".equals(md.dnsMode), "Tor+DNSCrypt+VPN applies flags");
+        com.skidwaredns.app.model.OperatingModes.apply(md, "Lockdown");
+        check(md.strictRoute && md.proxyLockdown, "Lockdown applies flags");
+        check("512 B".equals(com.skidwaredns.app.util.SkidEventBus.formatBytes(512)), "format 512 B");
+        check(com.skidwaredns.app.util.SkidEventBus.formatBytes(2048).contains("KB"), "format KB");
+        check(com.skidwaredns.app.util.SkidEventBus.formatBytes(3L * 1024 * 1024).contains("MB"), "format MB");
+        check(com.skidwaredns.app.util.SkidEventBus.formatBytes(2L * 1024 * 1024 * 1024).contains("GB"), "format GB");
+
         System.out.println();
         System.out.println(failures == 0 ? "PASS: VerifySkidV51 (" + checks + " checks)"
                 : "FAIL: " + failures + "/" + checks + " checks");

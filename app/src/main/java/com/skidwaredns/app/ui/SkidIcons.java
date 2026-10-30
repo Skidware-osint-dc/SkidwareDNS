@@ -110,7 +110,7 @@ public final class SkidIcons {
         stroke.setStyle(Paint.Style.STROKE);
         stroke.setStrokeCap(Paint.Cap.ROUND);
         stroke.setStrokeJoin(Paint.Join.ROUND);
-        stroke.setStrokeWidth(1.9f);
+        stroke.setStrokeWidth(2.25f);
         Paint fill = new Paint(Paint.ANTI_ALIAS_FLAG);
         fill.setColor(color);
         fill.setStyle(Paint.Style.FILL);
@@ -252,9 +252,9 @@ public final class SkidIcons {
                 drawHome(c, s);
                 break;
             case STATS:
-                rr(c, f, 5.0f, 14.2f, 8.6f, 19.5f, 1.1f);
-                rr(c, f, 10.2f, 9.2f, 13.8f, 19.5f, 1.1f);
-                rr(c, f, 15.4f, 5.2f, 19.0f, 19.5f, 1.1f);
+                rr(c, f, 5.0f, 14.2f, 8.6f, 19.5f, 1.2f);
+                rr(c, f, 10.2f, 9.2f, 13.8f, 19.5f, 1.2f);
+                rr(c, f, 15.4f, 5.2f, 19.0f, 19.5f, 1.2f);
                 break;
             case SKID:
                 drawSkid(c, s);

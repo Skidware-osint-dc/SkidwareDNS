@@ -1,3 +1,9 @@
+# SkidwareDNS v5.9 ("Live home") — `5.9.0-skid` (`versionCode 590`)
+
+Home now has a live **allowed vs blocked** chart (tap a series or the chips to inspect events), a 6-line **recent log**, and live **↑/↓ bytes** (B / KB / MB / GB) plus packet count. Operating modes expanded to 15 (WireGuard, Mullvad, SSH-Tunnel, Lockdown, LAN-Tools, …). Icons use a heavier 2.25px stroke.
+
+---
+
 # SkidwareDNS v5.8 ("Icons & chrome") — `5.8.0-skid` (`versionCode 580`)
 
 Line icons redrawn Lucide-style (thicker round stroke, 3× supersample). Hub/settings rows sit in accent-tinted wells. Cards use a top-to-bottom wash. Selected tab is sky, not grey-on-grey. Tools glyphs (FTP, SSH, RADAR…) no longer collapse to a dot.
@@ -247,7 +253,7 @@ The tool count grew to 25 screens across five vendors; v5.2 reorganises them ins
 
 ```bash
 ./build_apk.sh
-# Outputs v5.8 (580 / 5.8.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
+# Outputs v5.9 (590 / 5.9.0-skid) v2+v3 signed APK -> /home/user/SkidwareDNS.apk
 
 # Host-JVM verification + .skid preset export (81 checks)
 java -cp <classes> VerifySkidV51 /home/user/SkidwareDNS/configs

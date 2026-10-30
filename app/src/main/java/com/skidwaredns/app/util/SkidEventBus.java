@@ -105,6 +105,15 @@ public final class SkidEventBus {
     public static final AtomicLong bytesIn = new AtomicLong(0);
     public static final AtomicLong bytesOut = new AtomicLong(0);
     public static final AtomicLong lastLatencyMs = new AtomicLong(0);
+    public static final AtomicLong packetsSeen = new AtomicLong(0);
+
+    private static final int HIST = 28;
+    private static final int[] histAllow = new int[HIST];
+    private static final int[] histBlock = new int[HIST];
+    private static int histWrite = 0;
+    private static long lastSampleMs = 0L;
+    private static long sampleAllow = 0L;
+    private static long sampleBlock = 0L;
 
     private SkidEventBus() {}
 
@@ -198,6 +207,7 @@ public final class SkidEventBus {
 
     public static void recordDnsEvent(final String qtype, final String domain, final String answer, long latency, boolean blocked) {
         udpPacketsHandled.incrementAndGet();
+        packetsSeen.incrementAndGet();
         if (blocked) {
             threatsBlocked.incrementAndGet();
             if (firewallBubbleEnabled) {
@@ -218,6 +228,69 @@ public final class SkidEventBus {
         }
         pushLog(new LogEntry(blocked ? "BLOCKED" : "DNS", blocked ? "WARN" : "INFO",
                 qtype, domain, answer, latency, blocked));
+        maybeSample();
+    }
+
+    public static void notePacket(int bytes, boolean outbound) {
+        packetsSeen.incrementAndGet();
+        if (bytes > 0) {
+            if (outbound) bytesOut.addAndGet(bytes);
+            else bytesIn.addAndGet(bytes);
+        }
+        maybeSample();
+    }
+
+    public static synchronized void maybeSample() {
+        long now = System.currentTimeMillis();
+        if (now - lastSampleMs < 350L) return;
+        lastSampleMs = now;
+        long a = queriesResolved.get();
+        long b = threatsBlocked.get();
+        histAllow[histWrite] = (int) Math.max(0L, a - sampleAllow);
+        histBlock[histWrite] = (int) Math.max(0L, b - sampleBlock);
+        sampleAllow = a;
+        sampleBlock = b;
+        histWrite = (histWrite + 1) % HIST;
+    }
+
+    public static int historyLen() { return HIST; }
+
+    public static synchronized int allowAt(int oldestIndex) {
+        int i = (histWrite + oldestIndex) % HIST;
+        return histAllow[i];
+    }
+
+    public static synchronized int blockAt(int oldestIndex) {
+        int i = (histWrite + oldestIndex) % HIST;
+        return histBlock[i];
+    }
+
+    public static String formatBytes(long n) {
+        if (n < 0) n = 0;
+        if (n < 1024L) return n + " B";
+        if (n < 1024L * 1024L) return String.format(Locale.US, "%.1f KB", n / 1024.0);
+        if (n < 1024L * 1024L * 1024L) return String.format(Locale.US, "%.2f MB", n / (1024.0 * 1024.0));
+        return String.format(Locale.US, "%.2f GB", n / (1024.0 * 1024.0 * 1024.0));
+    }
+
+    public static List<LogEntry> snapshotByBlocked(boolean blocked, int limit) {
+        List<LogEntry> out = new ArrayList<LogEntry>();
+        synchronized (LOG_RING) {
+            for (int i = 0; i < LOG_RING.size() && out.size() < limit; i++) {
+                LogEntry e = LOG_RING.get(i);
+                if (e.blocked == blocked) out.add(e);
+            }
+        }
+        return out;
+    }
+
+    public static List<LogEntry> snapshotRecent(int limit) {
+        List<LogEntry> out = new ArrayList<LogEntry>();
+        synchronized (LOG_RING) {
+            int n = Math.min(limit, LOG_RING.size());
+            for (int i = 0; i < n; i++) out.add(LOG_RING.get(i));
+        }
+        return out;
     }
 
     public static void logSystem(String category, String target, String detail) {
@@ -292,6 +365,11 @@ public final class SkidEventBus {
         bytesIn.set(0);
         bytesOut.set(0);
         lastLatencyMs.set(0);
+        packetsSeen.set(0);
+        sampleAllow = 0;
+        sampleBlock = 0;
+        histWrite = 0;
+        for (int i = 0; i < HIST; i++) { histAllow[i] = 0; histBlock[i] = 0; }
         notifyTelemetry();
     }
 

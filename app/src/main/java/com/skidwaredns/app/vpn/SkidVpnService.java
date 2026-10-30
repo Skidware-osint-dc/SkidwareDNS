@@ -22,6 +22,7 @@ import com.skidwaredns.app.config.SkidConfigStore;
 import com.skidwaredns.app.dns.DnsPacketCodec;
 import com.skidwaredns.app.dns.DnsUpstreamResolver;
 import com.skidwaredns.app.firewall.SkidFirewallEngine;
+import com.skidwaredns.app.model.OperatingModes;
 import com.skidwaredns.app.proxy.LocalProxyEngine;
 import com.skidwaredns.app.tunnel.TunnelEngine;
 import com.skidwaredns.app.tunnel.XrayUriAndRouteHelper;
@@ -169,7 +170,7 @@ public final class SkidVpnService extends VpnService {
             localProxy.start(activeConfig);
             com.skidwaredns.app.proxy.OpenPortEngine.get().restore(activeConfig);
 
-            if ("Proxy-Only".equalsIgnoreCase(activeConfig.mode)) {
+            if (!OperatingModes.usesVpnTun(activeConfig.mode)) {
                 engineActive.set(true);
                 String msg = "PROTECTED (Proxy-Only :" + activeConfig.getPrimaryLocalSocksPort() + ")";
                 SkidEventBus.setActiveTunAddress("127.0.0.1:" + activeConfig.getPrimaryLocalSocksPort());
@@ -210,9 +211,7 @@ public final class SkidVpnService extends VpnService {
                 if (activeConfig.fakeIpEnabled) {
                     try { builder.addRoute("198.18.0.0", 15); } catch (Exception ignored) {}
                 }
-                if ("VPN+DNS+Firewall".equalsIgnoreCase(activeConfig.mode)
-                        || "Tor+DNSCrypt+VPN".equalsIgnoreCase(activeConfig.mode)
-                        || "Tor+DNSCrypt+I2P".equalsIgnoreCase(activeConfig.mode)) {
+                if (OperatingModes.usesDefaultRoute(activeConfig.mode)) {
                     if (activeConfig.strictRoute) {
                         try {
                             builder.addRoute("0.0.0.0", 1);
@@ -232,8 +231,7 @@ public final class SkidVpnService extends VpnService {
                 try {
                     builder.addDnsServer(gwV6);
                     builder.addRoute(gwV6, 128);
-                    if (activeConfig.strictRoute && ("VPN+DNS+Firewall".equalsIgnoreCase(activeConfig.mode)
-                            || "Tor+DNSCrypt+VPN".equalsIgnoreCase(activeConfig.mode))) {
+                    if (activeConfig.strictRoute && OperatingModes.usesDefaultRoute(activeConfig.mode)) {
                         builder.addRoute("::", 1);
                         builder.addRoute("8000::", 1);
                     }
@@ -264,8 +262,7 @@ public final class SkidVpnService extends VpnService {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
                     && (activeConfig.proxyLockdown
-                    || "VPN+DNS+Firewall".equalsIgnoreCase(activeConfig.mode)
-                    || "Tor+DNSCrypt+VPN".equalsIgnoreCase(activeConfig.mode))
+                    || OperatingModes.usesDefaultRoute(activeConfig.mode))
                     && !"None".equalsIgnoreCase(activeConfig.proxyMode)) {
                 try {
                     builder.setHttpProxy(ProxyInfo.buildDirectProxy("127.0.0.1", activeConfig.getPrimaryLocalHttpPort()));

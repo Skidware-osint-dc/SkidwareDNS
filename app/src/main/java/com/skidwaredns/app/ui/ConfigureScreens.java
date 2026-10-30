@@ -145,7 +145,7 @@ public final class ConfigureScreens {
         headLeft.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         headLeft.addView(UiFactory.label(ctx, "Configure", 22f, UiFactory.COLOR_TEXT, true, false));
         headLeft.addView(UiFactory.label(ctx, "Every tool, one place \u2022 search or drill in", 12f, UiFactory.COLOR_MUTED, false, false));
-        TextView verChip = UiFactory.counterChip(ctx, "v5.8", UiFactory.COLOR_SKY);
+        TextView verChip = UiFactory.counterChip(ctx, "v5.9", UiFactory.COLOR_SKY);
         LinearLayout headRight = new LinearLayout(ctx);
         headRight.setOrientation(LinearLayout.HORIZONTAL);
         headRight.setGravity(Gravity.CENTER_VERTICAL);

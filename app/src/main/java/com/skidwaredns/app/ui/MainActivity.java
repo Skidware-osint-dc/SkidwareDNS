@@ -95,6 +95,11 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
     private TextView homeTcpDpiRowText;
     private ImageView homePauseBtn;
     private TextView homeStartPillBtn;
+    private LiveChartView homeChart;
+    private TextView homeAllowChip;
+    private TextView homeBlockChip;
+    private TextView homeBytesLine;
+    private LinearLayout homeMiniLogs;
 
     // Stats Live Refs
     private TextView statsGridSummaryTv;
@@ -351,6 +356,8 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         row1.addView(dnsPill);
         row1.addView(statePill);
         col.addView(row1);
+
+        col.addView(buildHomeLiveCard());
 
         // =====================================================================
         // v5.2 CLEANUP: one "Active route" summary card + one flat tool launcher
@@ -690,6 +697,165 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         return outer;
     }
 
+    private View buildHomeLiveCard() {
+        LinearLayout card = UiFactory.card(this, UiFactory.COLOR_BORDER);
+        LinearLayout head = new LinearLayout(this);
+        head.setOrientation(LinearLayout.HORIZONTAL);
+        head.setGravity(Gravity.CENTER_VERTICAL);
+        TextView title = UiFactory.label(this, "LIVE TRAFFIC", 11.5f, UiFactory.COLOR_SKY, true, false);
+        title.setLetterSpacing(0.08f);
+        title.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        homeBytesLine = UiFactory.label(this, "0 B  ·  0 pkts", 11.5f, UiFactory.COLOR_MUTED, true, true);
+        head.addView(title);
+        head.addView(homeBytesLine);
+        card.addView(head);
+
+        homeChart = new LiveChartView(this);
+        LinearLayout.LayoutParams cLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, UiFactory.dp(this, 112));
+        cLp.topMargin = UiFactory.dp(this, 8);
+        homeChart.setLayoutParams(cLp);
+        homeChart.setSeriesTap(new LiveChartView.SeriesTap() {
+            @Override public void onSeries(boolean blocked) {
+                showTrafficList(blocked);
+            }
+        });
+        card.addView(homeChart);
+
+        LinearLayout legend = new LinearLayout(this);
+        legend.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams lLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lLp.topMargin = UiFactory.dp(this, 10);
+        legend.setLayoutParams(lLp);
+        homeAllowChip = legendChip("ALLOWED  0", UiFactory.COLOR_EMERALD, false);
+        homeBlockChip = legendChip("BLOCKED  0", UiFactory.COLOR_CRIMSON, true);
+        legend.addView(homeAllowChip);
+        View gap = new View(this);
+        gap.setLayoutParams(new LinearLayout.LayoutParams(UiFactory.dp(this, 8), 1));
+        legend.addView(gap);
+        legend.addView(homeBlockChip);
+        card.addView(legend);
+
+        card.addView(UiFactory.label(this, "Tap Allowed / Blocked (or the chart) to inspect",
+                11f, UiFactory.COLOR_MUTED, false, false));
+
+        LinearLayout logHead = new LinearLayout(this);
+        logHead.setOrientation(LinearLayout.HORIZONTAL);
+        logHead.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams lhLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lhLp.topMargin = UiFactory.dp(this, 14);
+        logHead.setLayoutParams(lhLp);
+        TextView lt = UiFactory.label(this, "RECENT", 11.5f, UiFactory.COLOR_SKY, true, false);
+        lt.setLetterSpacing(0.08f);
+        lt.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+        TextView more = UiFactory.label(this, "Logs  >", 12f, UiFactory.COLOR_MUTED, true, false);
+        more.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { switchTab(4); }
+        });
+        logHead.addView(lt);
+        logHead.addView(more);
+        card.addView(logHead);
+
+        homeMiniLogs = new LinearLayout(this);
+        homeMiniLogs.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams mlLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mlLp.topMargin = UiFactory.dp(this, 6);
+        homeMiniLogs.setLayoutParams(mlLp);
+        card.addView(homeMiniLogs);
+        refreshHomeLive();
+        return card;
+    }
+
+    private TextView legendChip(String text, final int accent, final boolean blocked) {
+        TextView tv = UiFactory.label(this, text, 12f, accent, true, false);
+        tv.setPadding(UiFactory.dp(this, 12), UiFactory.dp(this, 8), UiFactory.dp(this, 12), UiFactory.dp(this, 8));
+        tv.setBackground(UiFactory.roundedRect(this,
+                UiFactory.mixColor(UiFactory.COLOR_ICON_BG, accent, 0.22f),
+                accent, 0.9f, 14f));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
+        tv.setLayoutParams(lp);
+        tv.setGravity(Gravity.CENTER);
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) { showTrafficList(blocked); }
+        });
+        return tv;
+    }
+
+    private void showTrafficList(boolean blocked) {
+        java.util.List<SkidEventBus.LogEntry> rows = SkidEventBus.snapshotByBlocked(blocked, 16);
+        String title = blocked ? "Blocked" : "Allowed";
+        if (rows.isEmpty()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(title)
+                    .setMessage("Nothing " + title.toLowerCase() + " yet. Start the engine or run a DNS probe.")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+        CharSequence[] items = new CharSequence[rows.size()];
+        for (int i = 0; i < rows.size(); i++) {
+            SkidEventBus.LogEntry e = rows.get(i);
+            items[i] = e.timeFormatted + "  " + e.target + "\n" + e.result;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle(title + "  ·  " + (blocked ? SkidEventBus.threatsBlocked.get() : SkidEventBus.queriesResolved.get()))
+                .setItems(items, null)
+                .setPositiveButton("Full logs", new DialogInterface.OnClickListener() {
+                    @Override public void onClick(DialogInterface d, int w) { switchTab(4); }
+                })
+                .show();
+    }
+
+    private void refreshHomeLive() {
+        if (homeChart != null) homeChart.invalidate();
+        long allow = SkidEventBus.queriesResolved.get();
+        long block = SkidEventBus.threatsBlocked.get();
+        if (homeAllowChip != null) homeAllowChip.setText("ALLOWED  " + allow);
+        if (homeBlockChip != null) homeBlockChip.setText("BLOCKED  " + block);
+        if (homeBytesLine != null) {
+            long up = SkidEventBus.bytesOut.get();
+            long down = SkidEventBus.bytesIn.get();
+            long pk = SkidEventBus.packetsSeen.get()
+                    + SkidEventBus.tcpStreamsHandled.get()
+                    + SkidEventBus.udpPacketsHandled.get();
+            homeBytesLine.setText("\u2191 " + SkidEventBus.formatBytes(up)
+                    + "   \u2193 " + SkidEventBus.formatBytes(down)
+                    + "   ·  " + pk + " pkts");
+        }
+        if (homeMiniLogs == null) return;
+        homeMiniLogs.removeAllViews();
+        java.util.List<SkidEventBus.LogEntry> rec = SkidEventBus.snapshotRecent(6);
+        if (rec.isEmpty()) {
+            homeMiniLogs.addView(UiFactory.label(this, "Waiting for DNS / firewall events…",
+                    12f, UiFactory.COLOR_MUTED, false, false));
+            return;
+        }
+        for (int i = 0; i < rec.size(); i++) {
+            final SkidEventBus.LogEntry e = rec.get(i);
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            row.setPadding(0, UiFactory.dp(this, 4), 0, UiFactory.dp(this, 4));
+            int accent = e.blocked ? UiFactory.COLOR_CRIMSON : UiFactory.COLOR_EMERALD;
+            TextView tag = UiFactory.label(this, e.blocked ? "BLK" : "OK", 10f, accent, true, true);
+            tag.setPadding(UiFactory.dp(this, 6), UiFactory.dp(this, 2), UiFactory.dp(this, 6), UiFactory.dp(this, 2));
+            tag.setBackground(UiFactory.roundedRect(this,
+                    UiFactory.mixColor(UiFactory.COLOR_ICON_BG, accent, 0.25f), accent, 0.8f, 8f));
+            TextView body = UiFactory.label(this, e.target, 12.5f, UiFactory.COLOR_TEXT, false, true);
+            body.setPadding(UiFactory.dp(this, 8), 0, 0, 0);
+            body.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+            row.addView(tag);
+            row.addView(body);
+            row.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) { showTrafficList(e.blocked); }
+            });
+            homeMiniLogs.addView(row);
+        }
+    }
+
     /** Home chip label summarising the active privacy modules, e.g. "DNS+TOR+I2P". */
     private String privacyChipLabel() {
         StringBuilder sb = new StringBuilder();
@@ -701,22 +867,21 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
     }
 
     private void showQuickModeSelectorDialog() {
-        final String[] opts = DnsPresets.OPERATING_MODES;
+        final String[] opts = com.skidwaredns.app.model.OperatingModes.NAMES;
+        final String[] blurbs = com.skidwaredns.app.model.OperatingModes.BLURBS;
+        CharSequence[] rows = new CharSequence[opts.length];
         int checked = 0;
         for (int i = 0; i < opts.length; i++) {
-            if (opts[i].equalsIgnoreCase(config.mode)) { checked = i; break; }
+            rows[i] = opts[i] + "\n" + blurbs[i];
+            if (opts[i].equalsIgnoreCase(config.mode)) { checked = i; }
         }
         new AlertDialog.Builder(this)
                 .setTitle("Operating Mode (" + config.name + ".skid)")
-                .setSingleChoiceItems(opts, checked, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(rows, checked, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        config.mode = opts[which];
-                        if ("Tor+DNSCrypt+VPN".equalsIgnoreCase(config.mode)) {
-                            config.torEnabled = true;
-                            config.dnsMode = "DNSCrypt";
-                        }
+                        com.skidwaredns.app.model.OperatingModes.apply(config, opts[which]);
                         persistAndReload("Mode -> " + config.mode);
                     }
                 })
@@ -1104,7 +1269,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
             startService(new Intent(this, SkidVpnService.class).setAction(SkidVpnService.ACTION_STOP));
             return;
         }
-        if ("Proxy-Only".equalsIgnoreCase(config.mode)) {
+        if (!com.skidwaredns.app.model.OperatingModes.usesVpnTun(config.mode)) {
             startSkidService(SkidVpnService.ACTION_START);
             return;
         }
@@ -1218,6 +1383,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
         if (currentTab == 4 && liveLogsListContainer != null) {
             populateLogs();
         }
+        if (currentTab == 0) refreshHomeLive();
     }
 
     @Override
@@ -1293,6 +1459,7 @@ public final class MainActivity extends Activity implements SkidEventBus.Listene
             homeTcpDpiRowText.setText("TCP/UDP • Buf " + config.socketBufferSizeKb + " KB • MSS "
                     + config.tcpMssClamp + " • DPI " + config.dpiStrategy + "/" + config.dpiTechnique);
         }
+        refreshHomeLive();
 
         if (homePauseBtn != null) {
             int pauseKind = paused ? SkidIcons.PLAY : SkidIcons.PAUSE;

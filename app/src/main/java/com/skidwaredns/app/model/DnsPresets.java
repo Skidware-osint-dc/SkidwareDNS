@@ -327,14 +327,7 @@ public final class DnsPresets {
     // 6. Built-in Anonymized DNSCrypt Relays (from v3/relays.md)
     public static final List<DnsEndpoint> DNSCRYPT_RELAYS;
 
-    public static final String[] OPERATING_MODES = new String[]{
-            "DNS+Firewall",
-            "VPN+DNS+Firewall",
-            "Proxy-Only",
-            "Tor+DNSCrypt+VPN",
-            "Tor+DNSCrypt+I2P",
-            "Mixnet-5Hop"
-    };
+    public static final String[] OPERATING_MODES = OperatingModes.NAMES;
 
     public static final String[] DNS_MODES = new String[]{
             "Rethink-DoH",
