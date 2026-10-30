@@ -3,9 +3,18 @@
 *.class
 *.dex
 *.idsig
+*.apk
 build/
 .gradle/
 local.properties
+
+# Signing — NEVER commit the release keystore or passwords.
+# The old skidwaredns-release.jks + password skidware1337 are burned
+# (they were in git history). Official APKs are signed in GitHub Actions.
+*.jks
+*.keystore
+*.p12
+.signing.env
 
 # IDE
 .idea/
@@ -14,7 +23,3 @@ local.properties
 # OS
 .DS_Store
 Thumbs.db
-
-# NOTE: skidwaredns-release.jks IS committed on purpose.
-# The store/key password is already hardcoded in build_apk.sh (skidware1337),
-# and keeping the same key means future builds stay updatable in place.

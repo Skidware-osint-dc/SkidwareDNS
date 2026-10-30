@@ -1,11 +1,13 @@
 # SkidwareDNS
 
-**v6.0.0-skid** · `versionCode 600` · Android 7+ (API 24) · target SDK 34 · [GPL-3.0-or-later](./LICENSE)
+**v6.0.1-skid** · `versionCode 601` · Android 7+ (API 24) · target SDK 34 · [GPL-3.0-or-later](./LICENSE)
+
+[![Build APK](https://github.com/Skidware-osint-dc/SkidwareDNS/actions/workflows/build-apk.yml/badge.svg)](https://github.com/Skidware-osint-dc/SkidwareDNS/actions/workflows/build-apk.yml)
 
 A local Android VPN, encrypted DNS router, firewall, and tunnel forge in **one APK**. Traffic stays on the device unless you turn on a tunnel. Profiles are plain-text **`.skid`** files you can export, share, and re-import.
 
 Package: `com.skidwaredns.app`  
-Signed APK: [`SkidwareDNS.apk`](./SkidwareDNS.apk) (v2 + v3, ~546K)
+Official APKs are built and signed by [GitHub Actions](https://github.com/Skidware-osint-dc/SkidwareDNS/actions/workflows/build-apk.yml) — download from [Releases](https://github.com/Skidware-osint-dc/SkidwareDNS/releases) or the latest workflow run (artifact **SkidwareDNS-signed**).
 
 ---
 
@@ -26,7 +28,7 @@ Nothing is uploaded. Blocklists, logs, and `.skid` profiles live on the phone.
 
 ## Install
 
-1. Download [`SkidwareDNS.apk`](./SkidwareDNS.apk) from this repo (or build it — see [Building](#building)).
+1. Download the signed APK from [Releases](https://github.com/Skidware-osint-dc/SkidwareDNS/releases) or [Actions](https://github.com/Skidware-osint-dc/SkidwareDNS/actions) (or build it — see [Building](#building)). **v6.0.1+ uses a new signing certificate** — uninstall any older SkidwareDNS first; Android will not update over the leaked v5/v6.0.0 key.
 2. Allow install from the source you used.
 3. Open the app. The **first-run intro** (six screens) explains DNS, modes, tunnels, and tools. Skip anytime; replay it from **Configure → Settings → Replay first-run intro**.
 4. Pick a mode on Home (chevron next to **START**), then tap **START**. Android will ask for the VPN consent dialog.
@@ -225,16 +227,46 @@ app/src/main/java/com/skidwaredns/app/
 
 ## Building
 
-Needs Android SDK **build-tools 34.0.0**, **android-34** platform, and a JDK **12+** to sign (keystore uses HmacPBESHA256). Compile can be JDK 11; `apksigner` must be 12+.
+### GitHub Actions (official)
+
+Every push to `main`, every pull request, and every `v*` tag runs [`.github/workflows/build-apk.yml`](.github/workflows/build-apk.yml):
+
+1. Temurin JDK 21
+2. Android **build-tools 34.0.0** + **android-34**
+3. `./build_apk.sh` (`versionCode 601` / `6.0.1-skid`)
+4. Uploads **SkidwareDNS-unsigned** always, **SkidwareDNS-signed** when repo secrets are present
+5. On a `v*` tag, attaches the signed APK to the GitHub Release
+
+Signing secrets (repo **Settings → Secrets and variables → Actions**), never in git:
+
+| Secret | Purpose |
+| --- | --- |
+| `SIGNING_KEYSTORE_BASE64` | Base64 of the PKCS12/JKS file |
+| `SIGNING_STORE_PASSWORD` | Keystore password |
+| `SIGNING_KEY_PASSWORD` | Key password (often the same) |
+| `SIGNING_KEY_ALIAS` | Alias, default `skidkey` |
+
+Forks and pull requests from forks do not get those secrets, so they produce an unsigned APK only.
+
+### Local
+
+Needs Android SDK **build-tools 34.0.0**, **android-34**, and JDK 21 to sign.
 
 ```bash
-export ANDROID_SDK_ROOT=/path/to/sdk          # build-tools/34.0.0 + platforms/android-34
-export JAVA_HOME=/path/to/jdk-21              # Temurin 21 works
+export ANDROID_SDK_ROOT=/path/to/sdk
+export JAVA_HOME=/path/to/jdk-21
 ./build_apk.sh
-# → /home/user/SkidwareDNS.apk  and  ./SkidwareDNS.apk
-#    versionCode 600 / versionName 6.0.0-skid
-#    signed v2 + v3 with skidwaredns-release.jks
+# without secrets → SkidwareDNS-unsigned.apk
+
+export SKID_KEYSTORE=/secure/path/release.jks
+export SKID_STOREPASS='…'
+export SKID_KEYPASS='…'
+export SKID_KEY_ALIAS=skidkey
+./build_apk.sh
+# → SkidwareDNS.apk (v2+v3)
 ```
+
+`build_apk.sh` will **not** generate a keystore into the tree.
 
 Host verification (after compiling app classes against `android.jar`):
 
@@ -243,7 +275,11 @@ java -cp <verify>:<classes>:<android.jar> VerifySkidV51 ./configs
 # PASS: VerifySkidV51 (197 checks)
 ```
 
-The release keystore `skidwaredns-release.jks` is in the tree on purpose so updates keep the same signer. Password is in `build_apk.sh`. Rotate it if you fork publicly and do not want that key.
+### Signing key rotation (read this)
+
+The old `skidwaredns-release.jks` and password `skidware1337` were committed to this repository. **That certificate is burned.** Anyone with a clone can still sign malware that Android will treat as an update to v5.x / v6.0.0 installs.
+
+v6.0.1+ is signed with a **new** key that lives only in GitHub Actions secrets. Uninstall the old app, then install the Actions/Release APK. Do not reuse the leaked JKS.
 
 ---
 
@@ -269,6 +305,10 @@ This project is **not** affiliated with Mullvad, Nym, the Tor Project, I2P, Reth
 ---
 
 ## Changelog
+
+### v6.0.1 — CI signing (`601` / `6.0.1-skid`)
+
+Release keystore removed from git. GitHub Actions compiles and signs the APK. New certificate (leaked `skidware1337` JKS is retired).
 
 ### v6.0 — Stack Lab (`600` / `6.0.0-skid`)
 

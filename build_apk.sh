@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Build SkidwareDNS. Signing is optional:
+#   SKID_KEYSTORE, SKID_STOREPASS, SKID_KEYPASS, SKID_KEY_ALIAS
+# If those are missing, an unsigned APK is written instead.
+# NEVER generate a keystore into the repo. NEVER hardcode passwords.
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -6,14 +10,25 @@ SDK_ROOT="${ANDROID_SDK_ROOT:-/opt/android-sdk}"
 BUILD_TOOLS="$SDK_ROOT/build-tools/34.0.0"
 PLATFORM_JAR="$SDK_ROOT/platforms/android-34/android.jar"
 
-export JAVA_HOME="${JAVA_HOME:-/usr/lib/jvm/java-21-openjdk-amd64}"
-JAVAC_BIN="/usr/lib/jvm/jdk-11/bin/javac"
-if [ ! -x "$JAVAC_BIN" ]; then
+if [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/javac" ]; then
   JAVAC_BIN="$JAVA_HOME/bin/javac"
+elif [ -x /usr/lib/jvm/jdk-11/bin/javac ]; then
+  JAVAC_BIN=/usr/lib/jvm/jdk-11/bin/javac
+else
+  JAVAC_BIN="$(command -v javac)"
 fi
-export PATH="$JAVA_HOME/bin:$BUILD_TOOLS:$PATH"
+export PATH="${JAVA_HOME:-}/bin:$BUILD_TOOLS:$PATH"
 
-WORK_DIR="/tmp/skidwaredns_build"
+VERSION_CODE="${SKID_VERSION_CODE:-601}"
+VERSION_NAME="${SKID_VERSION_NAME:-6.0.1-skid}"
+OUT_APK="${SKID_OUT_APK:-$PROJECT_DIR/SkidwareDNS.apk}"
+UNSIGNED_APK="${SKID_UNSIGNED_APK:-$PROJECT_DIR/SkidwareDNS-unsigned.apk}"
+KEYSTORE="${SKID_KEYSTORE:-$PROJECT_DIR/skidwaredns-release.jks}"
+KEY_ALIAS="${SKID_KEY_ALIAS:-skidkey}"
+STOREPASS="${SKID_STOREPASS:-}"
+KEYPASS="${SKID_KEYPASS:-$STOREPASS}"
+
+WORK_DIR="${SKID_WORK_DIR:-/tmp/skidwaredns_build}"
 rm -rf "$WORK_DIR"
 mkdir -p "$WORK_DIR/compiled_res" "$WORK_DIR/gen" "$WORK_DIR/classes" "$WORK_DIR/dex" "$WORK_DIR/apk"
 
@@ -27,8 +42,8 @@ aapt2 link \
   --java "$WORK_DIR/gen" \
   --min-sdk-version 24 \
   --target-sdk-version 34 \
-  --version-code 600 \
-  --version-name "6.0.0-skid" \
+  --version-code "$VERSION_CODE" \
+  --version-name "$VERSION_NAME" \
   -o "$WORK_DIR/apk/unsigned_unaligned.apk" \
   "$WORK_DIR/compiled_res/res.zip"
 
@@ -57,36 +72,26 @@ d8 \
 
 echo "[5/6] Aligning APK with zipalign..."
 zipalign -f -p 4 "$WORK_DIR/apk/unsigned_unaligned.apk" "$WORK_DIR/apk/aligned.apk"
+cp "$WORK_DIR/apk/aligned.apk" "$UNSIGNED_APK"
 
-KEYSTORE="$PROJECT_DIR/skidwaredns-release.jks"
-if [ ! -f "$KEYSTORE" ]; then
-  echo "Generating SkidwareDNS signing keystore..."
-  keytool -genkeypair \
-    -keystore "$KEYSTORE" \
-    -storepass skidware1337 \
-    -keypass skidware1337 \
-    -alias skidkey \
-    -keyalg RSA \
-    -keysize 2048 \
-    -validity 10000 \
-    -dname "CN=SkidwareDNS, OU=Security, O=Skidware, L=Seattle, ST=WA, C=US"
+if [ ! -f "$KEYSTORE" ] || [ -z "$STOREPASS" ]; then
+  echo "No SKID_KEYSTORE + SKID_STOREPASS — leaving UNSIGNED apk at $UNSIGNED_APK"
+  echo "SUCCESS: Built unsigned Android APK -> $UNSIGNED_APK"
+  exit 0
 fi
 
-echo "[6/6] Signing APK (v1 + v2 + v3 schemes) & verifying..."
-OUT_APK_ROOT="/home/user/SkidwareDNS.apk"
-OUT_APK_PROJ="$PROJECT_DIR/SkidwareDNS.apk"
-
+echo "[6/6] Signing APK (v2 + v3) & verifying..."
+mkdir -p "$(dirname "$OUT_APK")"
 apksigner sign \
   --ks "$KEYSTORE" \
-  --ks-key-alias skidkey \
-  --ks-pass pass:skidware1337 \
-  --key-pass pass:skidware1337 \
+  --ks-key-alias "$KEY_ALIAS" \
+  --ks-pass "pass:$STOREPASS" \
+  --key-pass "pass:$KEYPASS" \
   --v1-signing-enabled true \
   --v2-signing-enabled true \
   --v3-signing-enabled true \
-  --out "$OUT_APK_ROOT" \
+  --out "$OUT_APK" \
   "$WORK_DIR/apk/aligned.apk"
 
-cp "$OUT_APK_ROOT" "$OUT_APK_PROJ"
-apksigner verify --verbose --print-certs "$OUT_APK_ROOT"
-echo "SUCCESS: Built signed Android APK -> $OUT_APK_ROOT"
+apksigner verify --verbose --print-certs "$OUT_APK"
+echo "SUCCESS: Built signed Android APK -> $OUT_APK"
